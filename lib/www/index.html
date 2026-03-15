@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CORD Demo</title>
+  <style>
+    .red {
+      background-color: red;
+      color: white;
+    }
+    .blue {
+      background-color: blue;
+      color: white;
+    }
+    .right {
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- page -->
+  <button onclick="clock.$align='right'">align</button>
+  <div cord-ref="clock" class="${klass} ${align}">
+    ${hour}:${min}:${sec}
+  </div>
+  <svg height="120" width="120" xmlns="http://www.w3.org/2000/svg">
+    <circle cord-ref="circle" r="${radius}" cx="60" cy="60" fill="red" />
+  </svg>
+
+  <script src="./cord.js"></script>
+  <script>
+    const config = {
+      createGlobals: true
+    };
+    $CORD.init({
+        clock: {
+            hour: 10,
+            min: 20,
+            sec: 30,
+            align: '',
+            klass: 'red'
+        },
+        circle: {
+            radius: 15
+        }
+    }, config);
+    
+    function update_clock() {
+      const t = Temporal.Now.plainTimeISO();
+      $CORD.update('clock', {
+         hour: t.hour,
+         min: t.minute,
+         sec: t.second,
+         klass: t.second % 2 == 0 ? 'red' : 'blue'
+       });
+       $CORD.update('circle', {
+         radius: t.second
+       });
+    }         
+    setInterval(update_clock, 1000);
+  </script>
+</body>
+
+</html>
