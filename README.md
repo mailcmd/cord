@@ -2,14 +2,23 @@
 
 # TODO
 
-- [ ] Error 404 page 
+## HTTP
 - [ ] HTTP: Evaluate html files as strings to expand before send to the client
+- [ ] Error 404 page 
 - [ ] Automatic load of CSS files 
 - [ ] Automatic load of extras JS files
 
+- WEBSOCKET
+- [ ] Websocket support and connections with client CORD side
+- [ ] A protocol to send event from server to client althrough websocket
+
+- CLIENT SIDE
+- [ ] Client support for expand rows and stuff like that
+
+
 # CORD
 
-    CORD is a tiny framework to web development. 
+CORD is a tiny framework for web development. 
 
 ## Components
 
