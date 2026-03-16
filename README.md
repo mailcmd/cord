@@ -8,11 +8,11 @@
 - [ ] Automatic load of CSS files 
 - [ ] Automatic load of extras JS files
 
-- WEBSOCKET
+## WEBSOCKET
 - [ ] Websocket support and connections with client CORD side
 - [ ] A protocol to send event from server to client althrough websocket
 
-- CLIENT SIDE
+## CLIENT SIDE
 - [ ] Client support for expand rows and stuff like that
 
 
