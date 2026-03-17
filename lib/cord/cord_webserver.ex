@@ -1,4 +1,4 @@
-defmodule CORD.Plug do
+defmodule CORD.Webserver do
   @moduledoc """
   """
 

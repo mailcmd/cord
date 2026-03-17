@@ -13,10 +13,14 @@ defmodule CORD.Application do
     
     children = [
       # The HTTP Server
-      {Plug.Cowboy,
-       scheme: :http,
-       plug: {CORD.Plug, @config},
-       options: [port: Keyword.fetch!(http_config, :port)]
+      {
+        Plug.Cowboy,
+        scheme: :http,
+        plug: {CORD.Webserver, @config},
+        options: [
+          port: Keyword.fetch!(http_config, :port),
+          dispatch: dispatcher()
+        ]
       }
     ]
 
@@ -25,4 +29,15 @@ defmodule CORD.Application do
     Logger.log(:info, "[CORD] Starting CORD services...")
     Supervisor.start_link(children, opts)
   end
+
+  defp dispatcher do
+    [
+      {:_,
+       [
+         {"/websocket", CORD.Websocket, []},
+         {:_, Plug.Cowboy.Handler, {CORD.Webserver, @config}},
+       ]
+      }
+    ]
+  end  
 end

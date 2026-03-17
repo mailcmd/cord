@@ -19,8 +19,11 @@
 <div cord-tpl-ref="clock" cord-id="clock-1" class="${klass}" 
      style="margin-left: ${margin_left}%;">  
 </div>
-<input cord-id="clock-position" value="0" type="range" min="0" max="50" onchange="$CORD.$['clock-1'].$margin_left = this.value"/>
+<input cord-id="clock-position" value="0" type="range" min="0" max="50" style="width: 50%;"
+       onchange="$CORD.$['clock-1'].$margin_left = this.value"/>
+
 <div cord-tpl-ref="clock" cord-id="clock-2" class="${klass} ${align}">  
+  ${hour}:${min}:${sec}
 </div>
 
 <div cord-id="counter">
