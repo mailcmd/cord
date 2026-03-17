@@ -1,0 +1,32 @@
+<noscript cord-tpl-id="clock"> 
+  ${hour}:${min}:${sec}
+  <br>
+  <table>
+    <tr>
+      <th>col 1</th>
+      <th>col 2</th>
+    </tr>
+    :foreach r in rows :do 
+      <tr>
+        <td>:{r.a}</td>
+        <td>:{r.b}</td>
+      </tr>
+    :end 
+  </table>  
+</noscript>
+
+
+<div cord-tpl-ref="clock" cord-id="clock-1" class="${klass}" 
+     style="margin-left: ${margin_left}%;">  
+</div>
+<input cord-id="clock-position" value="0" type="range" min="0" max="50" onchange="$CORD.$['clock-1'].$margin_left = this.value"/>
+<div cord-tpl-ref="clock" cord-id="clock-2" class="${klass} ${align}">  
+</div>
+
+<div cord-id="counter">
+  <button onclick="$CORD.$.counter.$value-=1">&lt;</button>
+  ${value}
+  <button onclick="$CORD.$.counter.$value+=1">&gt;</button>
+</div>
+
+

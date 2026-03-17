@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>#{title}</title>
+  #{(for css <- css_files, do: "<link rel='stylesheet' type='text/css' href='@#{css}'>") |> Enum.join("\n")}
+  <style>
+    nocscript[cord-id] {
+        display: none;
+    }
+  </style>     
+</head>
+
+<body>
+  <!-- page start -->
+  #{main}
+  <!-- page end -->
+  <script src="cord-js"></script>
+  #{for js <- js_files do
+    "<script type='text/javascript' src='@#{js}'></script>"
+  end |> Enum.join("\n")}
+</body>
+
+</html>
