@@ -4,6 +4,8 @@ defmodule CORD.Application do
   use Application
   require Logger
 
+  @config Application.compile_env!(:cord, :http)
+
   @impl true
   def start(_type, _args) do
 
@@ -11,10 +13,9 @@ defmodule CORD.Application do
     
     children = [
       # The HTTP Server
-      # {Plug.Cowboy, scheme: :http, plug: CORD.Plug, options: [port: 8080]}
       {Plug.Cowboy,
        scheme: :http,
-       plug: CORD.Router,
+       plug: {CORD.Plug, @config},
        options: [port: Keyword.fetch!(http_config, :port)]
       }
     ]
