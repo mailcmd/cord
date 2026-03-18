@@ -1,12 +1,12 @@
 defmodule CORD.Websocket do
   @behaviour :cowboy_websocket
 
-  def init(req, _opts) do
-    IO.inspect( req );
+  def init(conn, _opts) do
+    IO.inspect( conn );
     {
       :cowboy_websocket,
-      req,
-      %{},
+      conn,
+      %{pid: conn.pid},
       %{
         # 1 min w/o a ping from the client and the connection is closed
         idle_timeout: 3_600_000,
@@ -20,12 +20,15 @@ defmodule CORD.Websocket do
     {:ok, state}
   end
 
-  def terminate(_reason, _req, _state) do
+  def terminate(_reason, _conn, _state) do
     :ok
   end
 
-  # Receive a message
+  ################################################################################################
+  ## Main receiver
+  ################################################################################################
   def websocket_handle({:text, msg}, state) do
+    IO.inspect state
     IO.inspect msg, label: "RECEIVED"
     msg = 
       case JSON.decode(msg) do
@@ -37,8 +40,11 @@ defmodule CORD.Websocket do
     {:reply, {:text, response}, state}
   end
 
+  ################################################################################################
+  ## Unknown messages
+  ################################################################################################
   def websocket_info(msg, state) do
-    IO.inspect msg, label: "INFO"
+    # IO.inspect msg, label: "INFO"
     {:reply, {:text, msg}, state}
   end
 

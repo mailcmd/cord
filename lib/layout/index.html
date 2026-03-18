@@ -2,7 +2,9 @@
 <html>
 <head>
   <title>#{title}</title>
-  #{(for css <- css_files, do: "<link rel='stylesheet' type='text/css' href='@#{css}'>") |> Enum.join("\n")}
+
+  #{(for css <- css_files,
+                do: "<link rel='stylesheet' type='text/css' href='@#{css}'>") |> Enum.join("\n")}
   <style>
     nocscript[cord-id] {
         display: none;

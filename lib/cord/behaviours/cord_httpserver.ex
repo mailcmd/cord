@@ -31,6 +31,7 @@ defmodule CORD.HTTPServer do
             %{method: "GET", request_path: unquote(path)} = var!(conn),
             var!(opts)
           ) do
+        _ = var!(opts)
         unquote(block)
       end      
     end	  

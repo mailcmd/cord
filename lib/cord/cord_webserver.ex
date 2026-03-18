@@ -44,6 +44,14 @@ defmodule CORD.Webserver do
     |> send_resp(200, cord_js)
   end
 
+  get "/favicon.ico" do
+    icon = "data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII="
+
+    conn
+    |> put_resp_content_type("image/x-icon")
+    |> send_resp(200, icon)
+  end
+
   ###################################################################################
   # Custom JSs and CSSs 
   ###################################################################################

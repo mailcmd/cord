@@ -6,13 +6,21 @@
       <th>col 1</th>
       <th>col 2</th>
     </tr>
-    :foreach r in rows :do 
+    :foreach r in rows :do
       <tr>
         <td>:{r.a}</td>
         <td>:{r.b}</td>
       </tr>
     :end 
   </table>  
+
+  :foreach r in rows :do
+  <div>
+    <span>:{r.a}</span>
+    <span>:{r.b}</span>
+  </div>
+  :end 
+
 </noscript>
 
 
@@ -28,7 +36,7 @@
 
 <div cord-id="counter">
   <button onclick="$CORD.$.counter.$value-=1">&lt;</button>
-  ${value}
+  ${value * 10}
   <button onclick="$CORD.$.counter.$value+=1">&gt;</button>
 </div>
 
