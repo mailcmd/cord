@@ -1,3 +1,4 @@
+
 <noscript cord-tpl-id="clock"> 
   ${hour}:${min}:${sec}
   <br>
@@ -8,36 +9,55 @@
     </tr>
     :foreach r in rows :do
       <tr>
-        <td>:{r.a}</td>
-        <td>:{r.b}</td>
+        <td>${r.a}</td>
+        <td>${r.b}</td>
       </tr>
     :end 
   </table>  
 
   :foreach r in rows :do
   <div>
-    <span>:{r.a}</span>
-    <span>:{r.b}</span>
+    <span>${r.a}</span>
+    <span>${r.b}</span>
   </div>
   :end 
 
 </noscript>
 
-
 <div cord-tpl-ref="clock" cord-id="clock-1" class="${klass}" 
-     style="margin-left: ${margin_left}%;">  
-</div>
-<input cord-id="clock-position" value="0" type="range" min="0" max="50" style="width: 50%;"
-       onchange="$CORD.$['clock-1'].$margin_left = this.value"/>
+       style="margin-left: ${margin_left}%;"></div>
 
-<div cord-tpl-ref="clock" cord-id="clock-2" class="${klass} ${align}">  
-  ${hour}:${min}:${sec}
-</div>
 
 <div cord-id="counter">
+  
   <button onclick="$CORD.$.counter.$value-=1">&lt;</button>
   ${value * 10}
   <button onclick="$CORD.$.counter.$value+=1">&gt;</button>
+
 </div>
+<script>
+  function parseHTML(htmlString) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<template>${htmlString}</template>`, 'text/html');
+      console.log(doc)
+      return doc.body.firstElementChild; // Returns the <tr>
+  }
+  function createElementsFromHTML(htmlString) {
+      const div = document.createElement('div');
+      div.innerHTML = `<template>${htmlString}</template>`, 'text/html';
+      return div.children[0]; // Returns an HTMLCollection of all top-level elements
+  }    
+</script>
+<div cord-id="clock-2" class="${klass}">  
+  ${hour}:${min}:${sec}
+</div>
+
+<input cord-id="clock-position" value="0" type="range" min="0" max="50" style="width: 50%;"
+       onchange="$CORD.$['clock-1'].$margin_left = this.value"/>
+
+
+
+
+
 
 
