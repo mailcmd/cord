@@ -27,6 +27,8 @@ defmodule CORD.Webserver do
     # TODO: manage errors in evaluation
     html = Code.eval_string("\"\"\"\n#{index_file}\n\"\"\"", bindings) |> elem(0)
 
+    Logger.log(:info, "[CORD][HTTP] Main index loaded")
+
     conn
     |> assign(:init_options, opts)
     |> put_resp_content_type("text/html")
@@ -34,7 +36,7 @@ defmodule CORD.Webserver do
   end
 
   ###################################################################################
-  # CORD Client JS
+  # CORD Client JS and fixed content
   ###################################################################################
   get "/cord-js" do
     cord_js = File.read!("lib/layout/js/cord.js")
@@ -72,8 +74,20 @@ defmodule CORD.Webserver do
         conn
         |> Map.put(:request_path, file_name)
         |> call(opts)
-    end
-    
+    end    
   end
-  
+
+  ###################################################################################
+  # EventSource loop
+  ###################################################################################
+  get "/eventsource" do
+    Logger.log(:info, "[CORD][EventSource] Connection open")
+    conn
+    |> put_resp_header("X-Accel-Buffering", "no")
+    |> put_resp_header("Content-Type", "text/event-stream")
+    |> put_resp_header("Cache-Control", "no-cache")
+    |> send_chunked(200)
+    |> CORD.EventSource.loop()
+    Logger.log(:info, "[CORD][EventSource] Connection closed")
+  end
 end

@@ -1,8 +1,10 @@
 defmodule CORD.Websocket do
   @behaviour :cowboy_websocket
 
+  require Logger
+  
   def init(conn, _opts) do
-    IO.inspect( conn );
+    Logger.log(:info, "[CORD][Websocket] Connection open")
     {
       :cowboy_websocket,
       conn,
@@ -21,6 +23,7 @@ defmodule CORD.Websocket do
   end
 
   def terminate(_reason, _conn, _state) do
+    Logger.log(:info, "[CORD][Websocket] Connection closed")
     :ok
   end
 
