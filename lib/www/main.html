@@ -15,8 +15,10 @@
     :endforeach 
   </table>
 
-  :if min % 2 == 0 :do
+  :if sec % 2 == 0 :do
   <h1 class="${klass}">Hola</h1>
+  :else
+  <h1 class="">Chau</h1>
   :endif
 
 
@@ -29,8 +31,8 @@
 
 </noscript>
 
-  <div cord-tpl-ref="clock" cord-id="clock-1" class="" 
-       style="margin-left: ${margin_left}%;"></div>
+<div cord-tpl-ref="clock" cord-id="clock-1" class="" 
+     style="margin-left: ${margin_left}%;"></div>
 
 
 
