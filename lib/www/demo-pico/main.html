@@ -1,0 +1,25 @@
+<cord-load-templates>
+  @demo-pico/templates/list.thtml
+  @demo-pico/templates/counter.thtml
+</cord-load-templates>
+
+<header>
+  <h1>Demos</h1>
+</header>
+
+<main class="container">
+
+  <h2>Task Manager Demo</h2>
+  
+  <cord-container cord-id="tasks-list" cord-tpl-ref="list" cord-map="list:tasks">
+  </cord-container>  
+
+  <br>
+  <h2>Counter Demo</h2>
+
+  <cord-container cord-id="demo-counter" cord-tpl-ref="counter" cord-map="value:counter">
+  </cord-container>  
+  
+</main>
+
+<footer></footer>

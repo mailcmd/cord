@@ -190,7 +190,10 @@ const config = {
     }
 };
 
-$CORD.init(config);
+// 'cordready' event is dispached when finalize CORD bootstrap process
+window.addEventListener('cordready', e => {
+    $CORD.init(config);
+});
 
 ```
 
