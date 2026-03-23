@@ -39,3 +39,9 @@
 
 <cord-container cord-id="tasks-list" cord-tpl-ref="list" cord-map="list:tasks">
 </cord-container>
+
+<cord-container cord-id="counter">
+  <button onclick="$CORD.$.counter.$value-=1">&lt; Substract 10 </button>
+  ${value * 10}
+  <button onclick="$CORD.$.counter.$value+=1">Add 10 &gt;</button>
+</cord-container>
