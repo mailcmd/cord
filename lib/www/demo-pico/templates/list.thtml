@@ -1,13 +1,11 @@
 <cord-template cord-tpl-id="list">
-  <div class="grid grid-11">
-    <div>
-      <input placeholder="Task description..." size="50" id="desc" />
-    </div>
-    <div class="text-right">
-      <button onclick="list_add_item(desc.value, '%cord-id%', '%list%')">
-        Add
-      </button>
-    </div>
+  <div>
+  <fieldset role="group">
+    <input placeholder="Task description..." size="50" id="desc" />
+    <button onclick="list_add_item(desc.value, '%cord-id%', '%list%')">
+      Add
+    </button>
+  </fieldset>
   </div>
 
   <ul>
