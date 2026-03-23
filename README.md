@@ -14,12 +14,14 @@
    - [ ] Improve template parser (for, if) to allow nested statements (HARD!)
    - [x] Create a custom element cord-template to create noscript templates
    - [x] Create a custom element cord-container to invoke a cord-template 
+   - [ ] cord-style tag to load css and create superclasses.
+   - [ ] For CORD-server define a way to add extra headers to index.html
 
 ## WEBSOCKET
+   - [x] Define format for direct server update of cord_containers
    - [ ] Client fetch of data/templates/etc
    - [ ] Client subscribe to channels on server
    - [ ] Server send news to clients
-   - [x] Define format for direct server update of cord_containers
 
 
 # CORD
@@ -28,10 +30,10 @@ CORD is a tiny framework for web development.
 
 ## Concepts
 
-CORD is etentially a javascript client library (CORD-js) that allow to build reactive web pages. 
-On changing some a property of an object, automatically update the page content. 
+CORD is etentially a javascript client library (CORD-js) that allow to build reactive web pages, 
+i.e, changing some property of an object, automatically update the page content. 
 
-CORD also has a server side component (CORD-APP)) developed in Elixir language that open a HTTP 
+CORD also has a server side component (CORD-server)) developed in Elixir language that open a HTTP 
 server, a WebSocket server and a EventSource script server. But you can use CORD without any of 
 this or use your own server side deployment. 
 
@@ -230,7 +232,26 @@ $CORD.update_object('tasks-list', 'tasks', {action: 'splice', datas: [2,1] });
 ### $CORD.refresh(<cord-id>)
 Well, not much to explain, just refresh (re-render) all fields in the container. 
 
+**Missing DOC** 
+- $CORD.$... 
+- Websocket bidirectional communication and containers updates
+- EventSource server events to update containers
 
+  ## Some details to remember
+    - $CORD.$.<cord-id>
+      It is a reference to the container
+
+    - $CORD.$.<cord-id>.<field_name>
+      It is a reference to the field; it can be update but the refresh of the container will not
+      happen until '$CORD.update(<cord-id>)' be called. So it is an 'update delayed'.
+
+    - $CORD.$.<cord-id>.$<field_name>
+      It is a reference to the field; it can be update and the refresh of the container will
+      happen instantly. So it is an 'instant update'.
+
+
+
+`################################################################################################`
 
 ## Directory Struct
 
