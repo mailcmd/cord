@@ -1,5 +1,0 @@
-<cord-template cord-tpl-id="counter">
-  <button onclick="$CORD.$['%cord-id%'].$%value%-=1">&lt; Substract 10 </button>
-  <span>${%value% * 10}</span>
-  <button onclick="$CORD.$['%cord-id%'].$%value%+=1">Add 10 &gt;</button>
-</cord-template>
