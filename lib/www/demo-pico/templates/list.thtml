@@ -1,39 +1,54 @@
 <cord-template cord-tpl-id="list">
+  :if %list%.length % 2 == 0 :do
+    <h3>es par</h3>
+  :else
+    <h3>es impar</h3>
+    :if %list%.length > 5 :do
+      <h4>es mayor que 5</h4>
+    :else
+      <h4>es menor que 5</h4>
+    :endif
+  :endif
+  
   <div>
-  <fieldset role="group">
-    <input placeholder="Task description..." size="50" id="desc" />
-    <button onclick="list_add_item(desc.value, '%cord-id%', '%list%')">
-      Add
-    </button>
-  </fieldset>
+    <fieldset role="group">
+      <input placeholder="Task description..." size="50" id="desc" />
+      <button onclick="cord_list_add_item(desc.value, '%cord-id%', '%list%')">
+        Add
+      </button>
+    </fieldset>
   </div>
 
   <ul>
     :foreach item in %list% :do
     <li>
-      <div class="grid grid-1 vertical-align-center">
+      <div class="grid vertical-align-center"
+           style="grid-template-columns: 1fr 1fr 10fr;">
         <div class="text-center">
-          <button onclick="list_remove_item(${i}, '%cord-id%', '%list%')">
+          <button onclick="cord_list_remove_item(${item_i}, '%cord-id%', '%list%')">
             Remove
           </button>
         </div>
-        <div>${item.desc}</div>
+        :foreach col in item :do
+        <div>${col}</div>
+        :endforeach
     </li> 
     :endforeach
   </ul>  
   <cord-script>
-  list_add_item = function(text, cord_id, list) {
-    if (!text.trim()) return; 
+  cord_list_add_item = function(text, cord_id, list) {
+    if (!text.trim()) return;
+    const n = document.querySelectorAll('[cord-id="'+cord_id+'"] ul > li').length + 1;
     $CORD.update_object(
       cord_id,
       list,
-      {action: 'push', datas: [{desc: text}]}
+      {action: 'push', datas: [{nro: n, desc: text}]}
     );
     desc.value='';
     desc.focus();
   };
 
-  list_remove_item = function(i, cord_id, list) {
+  cord_list_remove_item = function(i, cord_id, list) {
     $CORD.update_object(cord_id, list, {action: 'splice', datas: [i, 1]});
   }; 
   </cord-script>

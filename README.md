@@ -11,10 +11,13 @@
    - [x] What happend with containers inside containers?
    - [x] Foreach: add index (i variable)
    - [x] Add :if/:else statement
-   - [ ] Improve template parser (for, if) to allow nested statements (HARD!)
+   - [x] Improve foreach parser to allow nested statements
+   - [ ] Improve if/else parser to allow nested statements
    - [x] Create a custom element cord-template to create noscript templates
    - [x] Create a custom element cord-container to invoke a cord-template 
    - [ ] cord-style tag to load css and create superclasses.
+   
+## SERVER
    - [ ] For CORD-server define a way to add extra headers to index.html
 
 ## WEBSOCKET
