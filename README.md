@@ -12,10 +12,11 @@
    - [x] Foreach: add index (i variable)
    - [x] Add :if/:else statement
    - [x] Improve foreach parser to allow nested statements
-   - [ ] Improve if/else parser to allow nested statements
+   - [x] Improve if/else parser to allow nested statements
    - [x] Create a custom element cord-template to create noscript templates
    - [x] Create a custom element cord-container to invoke a cord-template 
    - [ ] cord-style tag to load css and create superclasses.
+   - [ ] foreach and if parser while loop make security exit (max nested depth)
    
 ## SERVER
    - [ ] For CORD-server define a way to add extra headers to index.html
