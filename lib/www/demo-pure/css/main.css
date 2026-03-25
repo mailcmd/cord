@@ -104,13 +104,3 @@ ul li {
     align-self: center;
     vertical-align: center;
 }
-
-.clock {
-    position: fixed;
-    top: 0.5rem;
-    right: 0.5rem;
-    z-index: 1;
-    padding: 1rem;
-    background-color: red;
-    color: white;    
-}

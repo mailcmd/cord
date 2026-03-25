@@ -12,26 +12,29 @@
   :endif
   
   <div>
-    <fieldset role="group">
-      <input placeholder="Task description..." size="50" id="desc" />
-      <button onclick="cord_list_add_item(desc.value, '%cord-id%', '%list%')">
-        Add
-      </button>
-    </fieldset>
+    <form class="pure-form">        
+      <fieldset>
+        <input placeholder="Task description..." size="50" id="desc" />
+        <button class="pure-button pure-button-primary"
+                onclick="cord_list_add_item(desc.value, '%cord-id%', '%list%')">
+          Add
+        </button>
+      </fieldset>
+    </form>
   </div>
 
   <ul>
     :foreach item in %list% :do
-    <li>
-      <div class="grid vertical-align-center"
-           style="grid-template-columns: 1fr 1fr 10fr;">
-        <div class="text-center">
-          <button onclick="cord_list_remove_item(${item_i}, '%cord-id%', '%list%')">
+    <li style="margin-bottom: 0.2rem;">
+      <div class="pure-g vertical-align-center">
+        <div class="pure-u-4-24 text-center">
+          <button class="pure-button pure-button-primary"
+                  onclick="cord_list_remove_item(${item_i}, '%cord-id%', '%list%')">
             Remove
           </button>
         </div>
         :foreach col in item :do
-        <div>${col}</div>
+        <div class="pure-u-1-24 text-center">${col}</div>
         :endforeach
     </li> 
     :endforeach

@@ -2,6 +2,7 @@
 
 # TODO
 
+## CORD-js
    - [x] Why templates? Can I just use directly the element? It seems that not :(
    - [x] I need an evaluator, it is not enough just replace field name.
    - [x] Check if there is changes, if not do nothing (if change only attrs no update inside).
@@ -16,7 +17,7 @@
    - [x] Create a custom element cord-template to create noscript templates
    - [x] Create a custom element cord-container to invoke a cord-template 
    - [ ] cord-style tag to load css and create superclasses.
-   - [ ] foreach and if parser while loop make security exit (max nested depth)
+   - [x] foreach and if parser while loop make security exit (max nested depth)
    
 ## SERVER
    - [ ] For CORD-server define a way to add extra headers to index.html

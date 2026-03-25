@@ -1,0 +1,15 @@
+<cord-template cord-tpl-id="clock">
+  <div class="clock">
+    ${hour}:${minute}:${second}
+  </div>
+
+  <cord-script>
+    setInterval(() => {
+      const t = Temporal.Now.plainTimeISO();
+      $CORD.$['%cord-id%'].$hour = t.hour.toString().padStart(2, '0');
+      $CORD.$['%cord-id%'].$minute = t.minute.toString().padStart(2, '0');
+      $CORD.$['%cord-id%'].$second = t.second.toString().padStart(2, '0');    
+    }, 1000);
+  </cord-script>
+</cord-template>
+
