@@ -7,7 +7,7 @@
    - [x] I need an evaluator, it is not enough just replace field name.
    - [x] Check if there is changes, if not do nothing (if change only attrs no update inside).
    - [x] Open websocket to enable server side change container (SSCC)
-   - [ ] Dynamic fetch and add templates/html from server
+   - [x] Dynamic fetch and add templates/html from server
    - [x] EventSource support (work as websocket but no channels)
    - [x] What happend with containers inside containers?
    - [x] Foreach: add index (i variable)
