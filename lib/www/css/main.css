@@ -1,11 +1,116 @@
-.red {
-    background-color: red;
-    color: white;
+:root,
+:host {
+    --pico-font-size: 100%;
+    --pico-border-radius: 0.75rem;
 }
-.blue {
-    background-color: blue;
-    color: white;
+
+body, main {
+    width: 100%;
+    padding: 1rem;
 }
-.right {
+
+header {
+    text-align: center;
+}
+
+ul {
+    padding: 1rem;
+    background-color: var(--pico-code-background-color);
+}
+
+ul li {
+    list-style: none;
+}
+
+.w-10 {
+    width: 10%;
+}
+.w-20 {
+    width: 20%;
+}
+.w-30 {
+    width: 30%;
+}
+.w-40 {
+    width: 40%;
+}
+.w-50 {
+    width: 50%;
+}
+.w-60 {
+    width: 60%;
+}
+.w-70 {
+    width: 70%;
+}
+.w-80 {
+    width: 80%;
+}
+.w-90 {
+    width: 90%;
+}
+.w-100 {
+    width: 100%;
+}
+
+.grid-11 {
+    grid-template-columns: 11fr 1fr; 
+}
+.grid-10 {
+    grid-template-columns: 10fr 2fr; 
+}
+.grid-9 {
+    grid-template-columns: 9fr 3fr; 
+}
+.grid-8 {
+    grid-template-columns: 8fr 4fr; 
+}
+.grid-7 {
+    grid-template-columns: 7fr 5fr
+}
+.grid-6 {
+    grid-template-columns: 6fr 6fr; 
+}
+.grid-5 {
+    grid-template-columns: 5fr 7fr; 
+}
+.grid-4 {
+    grid-template-columns: 4fr 8fr; 
+}
+.grid-3 {
+    grid-template-columns: 3fr 9fr; 
+}
+.grid-2 {
+    grid-template-columns: 2fr 10fr; 
+}
+.grid-1 {
+    grid-template-columns: 1fr 11fr; 
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+.text-right {
     text-align: right;
+}
+
+.vertical-align-center {
+    align-items: center;
+    align-content: center;
+    align-self: center;
+    vertical-align: center;
+}
+
+.clock {
+    position: fixed;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 1;
+    padding: 1rem;
+    background-color: red;
+    color: white;    
 }

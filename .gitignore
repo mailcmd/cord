@@ -23,3 +23,5 @@ cord-*.tar
 /tmp/
 
 /config/local/*
+
+/demos/*

@@ -1,83 +1,24 @@
+<cord-load-templates>
+  @demo-pico/templates/list.thtml
+  @demo-pico/templates/counter.thtml
+</cord-load-templates>
 
-<noscript cord-tpl-id="clock"> 
-  ${hour}:${min}:${sec}
+<header>
+  <h1>Demos <button onclick="add_clock(this);" style="float: left;">Add Clock</button></h1>
+</header>
+
+<main class="container">
+  
+  <h2>Task Manager Demo</h2>  
+  <cord-container cord-id="tasks-list" cord-tpl-ref="list" cord-map="list:tasks">
+  </cord-container>  
+
   <br>
-  <table>
-    <tr>
-      <th>col 1</th>
-      <th>col 2</th>
-    </tr>
-    :foreach r in rows :do
-      <tr class="${klass}">
-        <td>${r.a} ${i+1}</td>
-        <td>${r.b} ${i+1}</td>
-      </tr>
-    :endforeach 
-  </table>
 
-  :if sec % 2 == 0 :do
-  <h1 class="${klass}">Hola</h1>
-  :else
-  <h1 class="">Chau</h1>
-  :endif
-
-
-  :foreach r in rows :do
-  <div>
-    <span>${r.a} ${i}</span>
-    <span>${r.b} ${i}</span>
-  </div>
-  :endforeach 
-
-</noscript>
-
-<div cord-tpl-ref="clock" cord-id="clock-1" class="" 
-     style="margin-left: ${margin_left}%;"></div>
-
-
-
-<div cord-id="counter">
-
-  <button onclick="$CORD.$.counter.$value-=1">&lt;</button>
-  ${value * 10}
-  <button onclick="$CORD.$.counter.$value+=1">&gt;</button>
-
-  <div cord-id="clock-2" class="${klass}">  
-    ${hour}:${min}:${sec}
-  </div>
+  <h2>Counter Demo</h2>
+  <cord-container cord-id="demo-counter" cord-tpl-ref="counter" cord-map="value:counter">
+  </cord-container>  
   
-</div>
+</main>
 
-
-<input cord-id="clock-position" value="0" type="range" min="0" max="50" style="width: 50%;"
-       onchange="$CORD.$['clock-1'].$margin_left = this.value"/>
-
-
-<script>
-  // function eval2(str) {
-  //     str = '\`'+str+'\`';
-  //     const result = []; 
-  //     const sandbox = new Proxy({}, {
-  //         get(target, prop) {
-  //             if (typeof prop == 'string') result.push(prop)
-  //             return {};
-  //         },
-  //         has(target, prop) {
-  //             return true;
-  //         }
-  //     });
-  //     const keys = Object.keys(sandbox);
-  //     const values = Object.values(sandbox);
-  //     const evaluator = new Function(...keys,
-  //                                    // `with (this) { return \`${str}\`; }`
-  //                                    `with (this) { return ${str}; }`
-  //                                   );
-  //     evaluator.apply(sandbox, values);
-  //     return result;
-  // }
-
-
-  // console.log(eval2('${sec % 2 == 0}'))
-
-  
-</script>
+<footer></footer>
