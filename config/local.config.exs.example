@@ -2,8 +2,9 @@
 
 import Config
 
-config :cord, :local_config, 
-    websocket_processor: :a,
+
+config :cord, :local_config,
+    websocket_processor: CORD.Websocket.Processor,
     title: "Testing CORD",
     main_file: "main.html",
     css_files: [
