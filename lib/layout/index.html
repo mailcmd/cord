@@ -17,10 +17,10 @@
   <!-- page start -->
   #{main}
   <!-- page end -->
-  <script src="cord-js"></script>
   #{for js <- js_files do
     "<script type='text/javascript' src='@#{js}'></script>"
   end |> Enum.join("\n")}
+  <script src="cord-js"></script>
 </body>
 
 </html>

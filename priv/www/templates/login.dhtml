@@ -1,0 +1,40 @@
+<cord-template cord-tpl-id="tpl-login">
+  :if ! #{main:token} :do 
+  <dialog open>
+    <article style="width: 30rem;">
+      <div>
+        <hgroup>
+          <h1 class="primary header text-right">Sign in</h1>
+        </hgroup>
+        <form onsubmit=
+          "return syslib.authorize_user(this.elements.login.value, this.elements.password.value)">
+          <input
+            type="text"
+            name="login"
+            placeholder="Login"
+            aria-label="Login"
+            autocomplete="username"
+            required
+            >
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            aria-label="Password"
+            autocomplete="current-password"
+            required
+            >
+          <fieldset>
+            <label for="remember">
+              <input type="checkbox" role="switch" id="remember" name="remember">
+              Remember me
+            </label>
+          </fieldset>
+          <button type="submit" class="" onclick="">Login</button>
+        </form>
+      </div>
+      <div></div>
+    </article>
+  </dialog>
+  :endif
+</cord-template>

@@ -5,12 +5,11 @@ defmodule CORD.Application do
   require Logger
 
   @config Application.compile_env!(:cord, :http)
+  @local_config Application.compile_env!(:cord, :local_config)
 
   @impl true
   def start(_type, _args) do
 
-    http_config = Application.get_env(:cord, :http)
-    
     children = [
       # The HTTP Server
       {
@@ -18,7 +17,7 @@ defmodule CORD.Application do
         scheme: :http,
         plug: {CORD.Webserver, @config},
         options: [
-          port: Keyword.fetch!(http_config, :port),
+          port: Keyword.fetch!(@config, :port),
           dispatch: dispatcher()
         ]
       }
@@ -34,7 +33,11 @@ defmodule CORD.Application do
     [
       {:_,
        [
-         {"/websocket", CORD.Websocket, []},
+         {
+           "/websocket", CORD.Websocket, [
+             message_processor: Keyword.get(@local_config, :websocket_processor)
+           ]
+         },
          {:_, Plug.Cowboy.Handler, {CORD.Webserver, @config}},
        ]
       }

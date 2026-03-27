@@ -1,0 +1,16 @@
+# Example file, copy to config/local/config.exs
+
+import Config
+
+config :cord, :local_config, 
+    websocket_processor: :a,
+    title: "Testing CORD",
+    main_file: "main.html",
+    css_files: [
+      "css/pico.css",
+      "css/main.css"
+    ],
+    js_files: [
+      "js/syslib.js",
+      "js/main.js"
+    ]

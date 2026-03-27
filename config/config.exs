@@ -2,9 +2,9 @@ import Config
 
 config :cord, :http,
        port: 8080,
-       root_dir: "lib/www/",
-       js_dir: "lib/www/js",
-       css_dir: "lib/www/css",
+       root_dir: "priv/www/",
+       js_dir: "priv/www/js",
+       css_dir: "priv/www/css",
        cord_plug_options: []     # These options are passed to Cord.Plug.init/1 function.
 
 config :logger, :default_formatter,

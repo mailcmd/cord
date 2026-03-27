@@ -2,6 +2,15 @@
 
 # TODO
 
+## SECUTIRY
+   - The security of CORD is almost zero. Client rendering and client template alloc make CORD
+     a shit for build secure system. 
+      - [ ] Delayed templates load. Load templates after security check, not preload. 
+      - [ ] Session track on server side.
+      - [ ] Hide or ofuscate template path/names.
+      - [ ] Secure systems MUST use websocket, not HTTP fetch.
+      
+
 ## CORD-js
    - [x] Why templates? Can I just use directly the element? It seems that not :(
    - [x] I need an evaluator, it is not enough just replace field name.
@@ -176,12 +185,28 @@ const config = {
     websocket: {                                  // If defined set the way to connecto to websocket
         url: 'ws://localhost:8080/websocket',     // server. With reconnect in true the ws will do
         reconnect: true,                          // the best effort to keep the connection open.
-        reconnect_delay: 1000
+        reconnect_delay: 1000,
+        onmessage: <function_name>                // Generic message receiver. CORD intercept msg
+                                                  // and verify if action is 'cord-update' or 
+                                                  // 'cord-update-object' to attend CORD updates.
+                                                  // If not, call this 'onmessage' function with 
+                                                  // the message as parameter. 
+                                                  // When you use $CORD.ws.send(msg, ...), if you 
+                                                  // set in the msg 'msg_id' parameter and set in 
+                                                  // second parameter a callback, the interception 
+                                                  // of CORD is disabled for messages that arrive
+                                                  // with the same 'msg_id'.
+                                                  
     },
     eventsource: {                                // Same as websocket but with one direction 
         url: 'http://localhost:8080/eventsource', // service backed by EventSource.
         reconnect: true,
-        reconnect_delay: 1000
+        reconnect_delay: 1000,
+        onmessage: <function_name>                // Generic message receiver. CORD intercept msg
+                                                  // and verify if action is 'cord-update' or 
+                                                  // 'cord-update-object' to attend CORD updates.
+                                                  // If not, call this 'onmessage' function with 
+                                                  // the message as parameter. 
     },
     containers: {                                 // Set initials values for the fields inside
         'tasks-list': {                           // every cord-id defined container. 
@@ -239,6 +264,9 @@ $CORD.update_object('tasks-list', 'tasks', {action: 'splice', datas: [2,1] });
 
 ### $CORD.refresh(<cord-id>)
 Well, not much to explain, just refresh (re-render) all fields in the container. 
+
+
+
 
 **Missing DOC** 
 - $CORD.$... 
