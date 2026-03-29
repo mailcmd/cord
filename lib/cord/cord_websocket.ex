@@ -38,7 +38,7 @@ defmodule CORD.Websocket do
         {:ok, json} -> json
         _ -> msg
       end
-    response = process_message(msg, state)
+    {state, response} = process_message(msg, state)
     IO.inspect response, label: "RESPONSE"
     {:reply, {:text, response}, state}
   end

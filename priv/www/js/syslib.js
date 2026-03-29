@@ -18,11 +18,23 @@ function Syslib() {
 
     this.authorize_user = function(user, pass) {
         this.show_loading('Authorizing user...');
-        $CORD.ws.send({msg_id: 1, action: 'authorize', user: user, pass: pass}, msg => {
+        
+        $CORD.ws.send({
+            msg_id: 1,
+            action: 'authorize',
+            user: user,
+            pass: pass
+        },
+        msg => {
             console.log('AUTH', msg)
             this.hide_loading();
-            if (msg.authorize) $CORD.set("main:token", user)
+            if (msg.token) {
+                $CORD.set("main:token", msg.token)
+            } else {
+                $CORD.set("login:error", "Incorrect user or password!")
+            }
         });
+        
         return false;
     };
 

@@ -6,6 +6,9 @@
         <hgroup>
           <h1 class="primary header text-right">Sign in</h1>
         </hgroup>
+        :if error != '' :do
+        <div class="alert text-center">${error}</div> 
+        :endif
         <form onsubmit=
           "return syslib.authorize_user(this.elements.login.value, this.elements.password.value)">
           <input

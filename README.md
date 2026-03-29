@@ -3,13 +3,38 @@
 # TODO
 
 ## SECUTIRY
-   - The security of CORD is almost zero. Client rendering and client template alloc make CORD
-     a shit for build secure system. 
+   - The security of CORD is almost zero. Client rendering and client template 
+     alloc make CORD a shit for build secure system. 
+     Things to think about:
       - [ ] Delayed templates load. Load templates after security check, not preload. 
       - [ ] Session track on server side.
       - [ ] Hide or ofuscate template path/names.
       - [ ] Secure systems MUST use websocket, not HTTP fetch.
+   
+   - Thinking about a way to keep authorized sessions open
+     -> client send user/pass
+     <- server auth and if ok create a cuople of keys, one for client and the other 
+        for the server
+     * From here the server encrypt with his key the messages and the client decrypt
+       them, and in reverse, the client encrypt his messages with its key and the 
+       server decrypt them with its key. 
+     * NOTE: Complex, I should add in client side 3rd party libraries and I do not want
       
+   - Another Idea
+     * Server create the token using an internal and private encrypt algorithm. 
+       Token has inside an expire date/time. 
+     * Server send token to the client. 
+     * Client can not decrypt the token but use it to simple xor crypt the message. 
+     * Server receive messages from a cliente. 
+     * Server look for the stored token for that client. 
+     * Server check if the token is expired. 
+       -> If yes: 
+          * decrypt the message using the expired token and store it. 
+          * then send to client a new token with the response of the message if it is
+            required. 
+       -> If no: 
+          * decrypt the message using the expired token and store it. 
+          * send the response of the message if it is required (with the current token)
 
 ## CORD-js
    - [x] Why templates? Can I just use directly the element? It seems that not :(

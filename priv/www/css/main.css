@@ -97,6 +97,8 @@ html[data-scheme="dark"] {
 :host {
     --pico-font-size: 100%;
     --pico-border-radius: 0.75rem;
+    --light-danger: #FFB7B7;
+    --danger: #F14444;
 }
 
 body, main {
@@ -214,6 +216,14 @@ ul li {
     background-color: var(--pico-primary-background);
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
+}
+
+.alert {
+    color: var(--danger);
+    font-weight: bold;
+    border-radius: 0.3rem;
+    padding: 0.2rem;
+    margin-bottom: var(--pico-typography-spacing-vertical);
 }
 
 /* Specific styles */

@@ -11,6 +11,9 @@ const config = {
         loading: {
             message: 'Loading...'
         },
+        login: {
+            error: ''
+        },
         header: {
             title: 'SPI Down Monitor'
         },
