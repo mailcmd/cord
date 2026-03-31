@@ -15,11 +15,12 @@ const config = {
             error: ''
         },
         header: {
-            title: 'SPI Down Monitor'
+            title: document.head.querySelector('title').innerText
         },
         main: {
             token: null,
-            loading: false
+            loading: true,
+            username: ""
         }
     }
 };
@@ -27,5 +28,11 @@ const config = {
 window.addEventListener('cordready', e => {
     $CORD.init(config);
 });
+
+window.addEventListener('cordwebsocketready', e => {
+    syslib.check_session();
+});
+
+
     
 

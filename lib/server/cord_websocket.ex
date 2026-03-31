@@ -8,7 +8,11 @@ defmodule CORD.Websocket do
     {
       :cowboy_websocket,
       conn,
-      %{pid: conn.pid, message_processor: Keyword.get(opts, :message_processor)},
+      %{
+        pid: conn.pid,
+        message_processor: Keyword.get(opts, :message_processor),
+        conn: conn
+      },
       %{
         # 1 min w/o a ping from the client and the connection is closed
         idle_timeout: 3_600_000,
@@ -31,15 +35,15 @@ defmodule CORD.Websocket do
   ## Main receiver
   ################################################################################################
   def websocket_handle({:text, msg}, state) do
-    IO.inspect state
-    IO.inspect msg, label: "RECEIVED"
+    # IO.inspect state
+    # IO.inspect msg, label: "RECEIVED"
     msg = 
       case JSON.decode(msg) do
         {:ok, json} -> json
         _ -> msg
       end
     {state, response} = process_message(msg, state)
-    IO.inspect response, label: "RESPONSE"
+    # IO.inspect response, label: "RESPONSE"
     {:reply, {:text, response}, state}
   end
 

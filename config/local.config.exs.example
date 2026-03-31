@@ -5,6 +5,7 @@ import Config
 
 config :cord, :local_config,
     websocket_processor: CORD.Websocket.Processor,
+    app_supervisor: SPIDownDetector,
     title: "Testing CORD",
     main_file: "main.html",
     css_files: [
@@ -14,4 +15,4 @@ config :cord, :local_config,
     js_files: [
       "js/syslib.js",
       "js/main.js"
-    ]
+    ],

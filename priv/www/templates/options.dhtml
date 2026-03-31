@@ -1,0 +1,5 @@
+<cord-template cord-tpl-id="tpl-options">
+  <section>
+    <header>#{main:user}</header>
+  </section>
+</cord-template>

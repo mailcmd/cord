@@ -20,7 +20,11 @@ defmodule CORD.Application do
           port: Keyword.fetch!(@config, :port),
           dispatch: dispatcher()
         ]
-      }
+      },
+      # Channels manager
+      {ChannelsMaster, []},
+      # User defined APP 
+      @local_config[:app_supervisor]
     ]
 
     opts = [strategy: :one_for_one, name: CORD.Supervisor]
