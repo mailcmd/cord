@@ -1,12 +1,11 @@
-# Example file, copy to config/local/config.exs
-
 import Config
 
-
-config :cord, :local_config,
-    websocket_processor: CORD.Websocket.Processor,
+config :cord, :local_config, 
+    websocket_manager: WebsocketManager,
     app_supervisor: SPIDownDetector,
-    title: "Testing CORD",
+    events_pop_interval: 5_000,
+    
+    title: "SPI Down Detector",
     main_file: "main.html",
     css_files: [
       "css/pico.css",
@@ -15,4 +14,19 @@ config :cord, :local_config,
     js_files: [
       "js/syslib.js",
       "js/main.js"
-    ],
+    ]
+
+config :cord, :spi_down_detector,
+    token_expire: 600, # in seconds, default 3600 secs
+    db: [
+      hostname: "190.1.0.83",
+      database: "spi40db",
+      username: "spi40",
+      password: "passspi40"
+    ]
+
+config :cord, :ftth_collector,
+    start_delay: 5000,
+    node_delay: 500,
+    node_up_thresold: 0,
+    threads: 8

@@ -5,12 +5,16 @@ defmodule CORD.Websocket do
   
   def init(conn, opts) do
     Logger.log(:info, "[CORD][Websocket] Connection open")
+
+    websocket_manager = Keyword.fetch!(opts, :websocket_manager)
+    websocket_manager.process_connection(conn, :open)
+    
     {
       :cowboy_websocket,
       conn,
       %{
         pid: conn.pid,
-        message_processor: Keyword.get(opts, :message_processor),
+        websocket_manager: websocket_manager,
         conn: conn
       },
       %{
@@ -26,8 +30,9 @@ defmodule CORD.Websocket do
     {:ok, state}
   end
 
-  def terminate(_reason, _conn, _state) do
+  def terminate(_reason, _conn, %{websocket_manager: websocket_manager, conn: conn}) do
     Logger.log(:info, "[CORD][Websocket] Connection closed")
+    websocket_manager.process_connection(conn, :closed)
     :ok
   end
 
@@ -55,11 +60,11 @@ defmodule CORD.Websocket do
     {:reply, {:text, msg}, state}
   end
 
-  defp process_message(msg, %{message_processor: nil}) do
+  defp process_message(msg, %{websocket_manager: nil}) do
     JSON.encode!(msg)
   end
-  defp process_message(msg, %{message_processor: processor} = state) do
-    processor.process_message(msg, state)
+  defp process_message(msg, %{websocket_manager: websocket_manager} = state) do
+    websocket_manager.process_message(msg, state)
   end
   
 end

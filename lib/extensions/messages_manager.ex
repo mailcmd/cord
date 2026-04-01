@@ -1,20 +1,67 @@
-defmodule CORD.Websocket.Processor do
-  use CORD.Websocket.MessageProcessor
+defmodule MessagesManager do
+  use CORD.Websocket.Manager
+
+  alias CORD.ChannelsMaster
 
   @sdd_config Application.compile_env(:cord, :spi_down_detector)
 
+  ################################################################################################
+  # Callbacks 
+  ################################################################################################
+  @impl true
+  def process_connection(conn, :open) do
+    pids = recover(:cord_current_connections) || []
+    store(:cord_current_connections, [conn.pid | pids])
+  end
+  def process_connection(conn, :closed) do
+    pids =
+      recover(:cord_current_connections)
+      |> Kernel.||([])
+      |> List.delete(conn.pid)
+
+    store(:cord_current_connections, pids)
+  end
+
+  @impl true
+  def process_events([]), do: :ok
+  def process_events([[ts, channel, event_data] | events]) do
+    pids = process_events_h(channel)
+
+    event =
+      event_data
+      |> put_in([:channel], channel)
+      |> put_in([:ts], ts)
+
+    send_event(pids, event)
+    process_events(events)
+  end
+  # helper 
+  defp process_events_h(:broadcast), do: recover(:cord_current_connections) || []
+  defp process_events_h(channel) do
+    channel
+    |> ChannelsMaster.get_channel_clients()
+    |> Enum.map(fn user -> recover({user, :pid}) end)
+  end
+
+  ################################################################################################
+  # Callbacks for messages
+  ################################################################################################
   @impl true
   def process_message(%{"action" => "authorize"} = msg, state) do
     msg =
       case authorize_user(msg["user"], msg["pass"]) do
-        :ok ->          
+        :ok ->
           token = gen_token(msg["user"])
           store({msg["user"], :token}, token)
           store({msg["user"], :pid}, state.pid)
+          # every user must subscribe to broadcast channel
+          ChannelsMaster.subscribe(msg["user"], :broadcast)
+
           msg
           |> put_in(["token"], token)
           |> put_in(["pass"], "*******")
-        
+          |> put_in(["subs"], ChannelsMaster.get_client_channels(msg["user"]))
+
         :error ->
           store({msg["user"], :token}, nil)
           put_in(msg, ["token"], nil)
@@ -24,12 +71,12 @@ defmodule CORD.Websocket.Processor do
   end
 
   def process_message(%{"action" => "check_session"} = msg, state) do
-    reply(state, check_session(msg))
+    reply(state, check_session(msg, state))
   end
 
   def process_message(%{"action" => "subscribe"} = msg, state) do
     msg =
-      with %{"session_ok" => true} <- check_session(msg),
+      with %{"session_ok" => true} <- check_session(msg, state),
            {_, username} <- get_token_info(msg["token"]),
            [:ok] <- ChannelsMaster.subscribe(username, String.to_atom(msg["channel"])) do
         put_in(msg, ["result_ok"], true)
@@ -46,7 +93,7 @@ defmodule CORD.Websocket.Processor do
 
   def process_message(%{"action" => "unsubscribe"} = msg, state) do
     msg =
-      with %{"session_ok" => true} <- check_session(msg),
+      with %{"session_ok" => true} <- check_session(msg, state),
            {_, username} <- get_token_info(msg["token"]),
            :ok <- ChannelsMaster.unsubscribe(username, String.to_atom(msg["channel"])) do
         put_in(msg, ["result_ok"], true)
@@ -63,14 +110,14 @@ defmodule CORD.Websocket.Processor do
 
   def process_message(%{"action" => "renew_token"} = msg, state) do
     msg =
-      case check_session(msg) do
+      case check_session(msg, state) do
         %{"session_ok" => true} ->
           %{"token" => token} = msg
           {_, username} = get_token_info(token)
           token = gen_token(username)
           store({msg["user"], :token}, token)
           put_in(msg, ["token"], token)
-        
+
         msg ->
           msg
       end
@@ -80,7 +127,7 @@ defmodule CORD.Websocket.Processor do
 
   def process_message(%{"action" => "get_channels"} = msg, state) do
     msg =
-      with %{"session_ok" => true} <- check_session(msg),
+      with %{"session_ok" => true} <- check_session(msg, state),
            list <- ChannelsMaster.list_channels() do
         put_in(msg, ["channels"], list)
       else
@@ -104,27 +151,31 @@ defmodule CORD.Websocket.Processor do
   ################################################################################################
   defp store(key, value) do
     :persistent_term.put({:cord, key}, value)
+    :ok
   end
 
   defp recover(key) do
     :persistent_term.get({:cord, key}, nil)
   end
 
-  defp check_session(msg) do
+  defp check_session(msg, state) do
+    {_, username} = get_token_info(msg["token"])
     case check_token(msg) do
       :ok ->
-        msg 
+        store({username, :pid}, state.conn.pid)
+        msg
         |> put_in(["session_ok"], true)
+        |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
 
       {:renew, new_token} ->
-        {_, username} = get_token_info(new_token)
         store({username, :token}, new_token)
+        store({username, :pid}, state.conn.pid)
         msg
         |> put_in(["session_ok"], true)
         |> put_in(["token"], new_token)
+        |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
 
       :error ->
-        {_, username} = get_token_info(msg["token"])
         store({username, :token}, nil)
         msg
         |> put_in(["session_ok"], false)
@@ -132,13 +183,13 @@ defmodule CORD.Websocket.Processor do
         |> Map.delete("msg_id")
         |> put_in(["token"], nil)
         |> put_in(["containers"], %{
-          main: %{ token: nil, loading: false }          
+          main: %{ token: nil, loading: false }
         })
     end
   end
 
   defp check_token(msg) do
-    %{"token" => token} = msg    
+    %{"token" => token} = msg
 
     with {ts, username} <- get_token_info(token),
          ts <- String.to_integer(ts),
@@ -321,5 +372,11 @@ defmodule CORD.Websocket.Processor do
     |> Enum.map(&String.pad_leading(&1, 2, "0"))
     |> Enum.join("")
     |> String.downcase()
+  end
+
+  defp send_event([], _), do: :ok
+  defp send_event([pid | pids], event) do
+    send(pid, JSON.encode!(event))
+    send_event(pids, event)
   end
 end

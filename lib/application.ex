@@ -22,7 +22,14 @@ defmodule CORD.Application do
         ]
       },
       # Channels manager
-      {ChannelsMaster, []},
+      {CORD.ChannelsMaster, [:broadcast]},
+      # Events manager
+      {CORD.EventsMaster,
+        {
+          Keyword.get(@local_config, :events_pop_interval),
+          Keyword.get(@local_config, :websocket_manager)
+        }               
+      },
       # User defined APP 
       @local_config[:app_supervisor]
     ]
@@ -39,7 +46,7 @@ defmodule CORD.Application do
        [
          {
            "/websocket", CORD.Websocket, [
-             message_processor: Keyword.get(@local_config, :websocket_processor)
+             websocket_manager: Keyword.get(@local_config, :websocket_manager)
            ]
          },
          {:_, Plug.Cowboy.Handler, {CORD.Webserver, @config}},

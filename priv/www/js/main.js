@@ -5,7 +5,7 @@ const config = {
     strict: true,
     websocket: {
         url: 'ws://localhost:8080/websocket',
-        onmessage: console.log // generic message receiver 
+        onmessage: syslib.onmessage
     },
     containers: {
         loading: {
@@ -21,6 +21,10 @@ const config = {
             token: null,
             loading: true,
             username: ""
+        },
+        options: {
+            visible: false,
+            channels: []
         }
     }
 };

@@ -1,5 +1,10 @@
 <cord-template cord-tpl-id="tpl-options">
-  <section>
+  <section visible="${visible}">
     <header>#{main:user}</header>
+    <ul>
+      :foreach ch in channels :do
+      <li>${ch}</li>
+      :endforeach
+    </ul>
   </section>
 </cord-template>

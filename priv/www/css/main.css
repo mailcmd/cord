@@ -105,6 +105,7 @@ html[data-scheme="dark"] {
     --spi3: #00599C;
     --spi4: #003F70;
     --spi5: #0B2E49;
+    --spi6: #071C2C;
 }
 
 body, main {
@@ -297,6 +298,23 @@ cord-container[cord-id="loading"] {
 cord-container[cord-id="login"] {
     position: relative;
     z-index: 1;
+}
+
+cord-container[cord-id="options"] > section {    
+    position: fixed;
+    top: 3.6rem;
+    background-color: var(--spi5);
+    right: 0;
+    width: 20rem;
+    height: calc(100% - 3.6rem);
+    transition-property: translate;
+    transition-duration: 0.2s;
+    translate: 100%;
+    box-shadow: inset 2px 0px 3px 2px var(--spi4);
+    padding: 1rem;
+}
+cord-container[cord-id="options"] > section[visible="true"] {
+    translate: 0;
 }
 
 /* icons */

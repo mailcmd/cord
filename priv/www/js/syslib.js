@@ -51,9 +51,36 @@ function Syslib() {
         },
     };
 
+    const attend_broadcast = function(msg) {
+        switch (msg.action) {
+        case 'add_channel':
+            $CORD.update_object('options', 'channels', {action: 'push', datas: [msg.target]})
+            break;
+        }
+    };
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Default message receiver
+    /////////////////////////////////////////////////////////////////////////////////
+    this.onmessage = function(msg) {
+        console.log('SYSLIB_ONMESSAGE', msg)
+        switch (msg.channel) {
+        case 'broadcast':
+            attend_broadcast(msg);
+            break;
+
+        case '':
+            break
+
+        default:
+            console.warn(`TODO: manage messages to channel = ${msg.channel} - msg:`, msg)
+        }
+    };
+
     /////////////////////////////////////////////////////////////////////////////////
     // Public API
     /////////////////////////////////////////////////////////////////////////////////
+
     this.show_loading = function(text = 'Loading...') {
         $CORD.set('loading:message', text);
         $CORD.set('main:loading', true);
@@ -77,7 +104,9 @@ function Syslib() {
                     // login ok
                     $CORD.set("main:token", msg.token)
                     $CORD.set("main:user", user)
+                    $CORD.set('options:channels', msg.subs);
                     set_cookie('token', msg.token);
+                    set_cookie('user', user);
                 } else {
                     // login fail
                     $CORD.set("login:error", "Incorrect user or password!")
@@ -99,11 +128,15 @@ function Syslib() {
             {token: token},
             msg => {
                 if (!msg.token) {
+                    // This block is never reached (cord-update message is intercepted)
+                    $CORD.set('main:token', null);
                     $CORD.set("login:error", "Session exired!")
                 } else {
                     $CORD.set('main:token', token);
+                    $CORD.set('main:user', get_cookie('user'));
+                    $CORD.set('options:channels', msg.subs);
                 }
-                this.hide_loading();                
+                this.hide_loading();
             }
         );
     };

@@ -1,4 +1,4 @@
-defmodule CORD.Websocket.MessageProcessor do
+defmodule CORD.Websocket.Manager do
 	defmacro __using__(_) do
     quote do
       @behaviour unquote(__MODULE__)
@@ -13,6 +13,9 @@ defmodule CORD.Websocket.MessageProcessor do
       end
     end
 	end
+  
+  @callback process_connection(conn :: map(), event :: atom()) :: :ok
+  @callback process_events(events :: list()) :: :ok
   @callback process_message(msg :: map(), state :: map())
               :: {state :: map, msg :: binary}
 end

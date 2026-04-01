@@ -1,4 +1,4 @@
-defmodule ChannelsMaster do
+defmodule CORD.ChannelsMaster do
   @moduledoc """
   table records:
     - {:available_channels, MapSet()}                            # uniq
@@ -67,6 +67,7 @@ defmodule ChannelsMaster do
   ## Callbacks
   ################################################################################################
   @impl true
+  def init(channel) when not is_list(channel), do: init([channel])
   def init(channels) do
     Logger.log(:info, "[ChannelsMaster] Initializing channels DB...")
     case :dets.open_file(:channels_master, [type: :set, file: ~c"priv/channels.dets"]) do
@@ -93,7 +94,10 @@ defmodule ChannelsMaster do
     new_channels_list = [channel | current_channels]
     :dets.insert(table, {:available_channels, MapSet.new(new_channels_list)})
 	  :dets.sync(table)
+
     Logger.log(:info, "[ChannelsMaster] Channel '#{channel}' added!")
+    push_broadcast_event(%{action: :add_channel, target: channel}, table)
+
     {:reply, Enum.uniq(new_channels_list), table}
   end
 
@@ -106,7 +110,10 @@ defmodule ChannelsMaster do
     :dets.match_delete(table, {{:subscription, channel, :"$1"}})
     :dets.insert(table, {:available_channels, MapSet.new(new_channels_list)})
 	  :dets.sync(table)
+    
+    push_broadcast_event(%{action: :remove_channel, target: channel}, table)
     Logger.log(:info, "[ChannelsMaster] Channel '#{channel}' removed!")
+
     {:reply, new_channels_list, table}
   end
 
@@ -159,7 +166,7 @@ defmodule ChannelsMaster do
     new_event = {{:event_queue, System.os_time(:second)}, channel, event}
     :dets.insert(table, new_event)
 	  :dets.sync(table)
-    Logger.log(:info, "[ChannelsMaster] pushed event '#{event}' to channel '#{channel}'")
+    Logger.log(:info, "[ChannelsMaster] pushed event '#{inspect event}' to channel '#{channel}'")
     {:reply, new_event, table}
   end
   
@@ -175,7 +182,7 @@ defmodule ChannelsMaster do
     events = :dets.match(table, {{:event_queue, :"$1"}, :"$2", :"$3"})
     :dets.match_delete(table, {{:event_queue, :"$1"}, :"$2", :"$3"})
 	  :dets.sync(table)
-    Logger.log(:info, "[ChannelsMaster] poped all events")
+    Logger.log(:debug, "[ChannelsMaster] poped all events")
     {:reply, events, table}
   end
   
@@ -187,6 +194,10 @@ defmodule ChannelsMaster do
       [{_, mapset}] -> MapSet.to_list(mapset)
       _ -> []
     end
+  end
+
+  defp push_broadcast_event(event, table) do
+    handle_call({:push_event, :broadcast, event}, nil, table)
   end
 
 end

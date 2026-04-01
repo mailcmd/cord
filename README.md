@@ -58,9 +58,11 @@
 
 ## WEBSOCKET
    - [x] Define format for direct server update of cord_containers
-   - [ ] Client fetch of data/templates/etc
-   - [ ] Client subscribe to channels on server
+   - [x] Client subscribe to channels on server
    - [ ] Server send news to clients
+   - [ ] Broadcast channel, all clients subscribed automatically.
+   - [ ] Send broadcast to notify about channels add/remove 
+   
 
 
 # CORD
@@ -288,8 +290,9 @@ $CORD.update_object('tasks-list', 'tasks', {action: 'splice', datas: [2,1] });
 ```
 
 ### $CORD.refresh(<cord-id>)
-Well, not much to explain, just refresh (re-render) all fields in the container. 
+Well, not much to explain, just refresh (re-render) all fields of each container. 
 
+`################################################################################################`
 
 
 
@@ -310,38 +313,15 @@ Well, not much to explain, just refresh (re-render) all fields in the container.
       It is a reference to the field; it can be update and the refresh of the container will
       happen instantly. So it is an 'instant update'.
 
+    - $CORD.set('<cord-id>:<field>', <value>) 
+    - $CORD.get('<cord-id>:<field>') 
 
 
 `################################################################################################`
 
 ## Directory Struct
 
-```
-lib/ 
-  cord/
-  layout/
-    js/
-    css/
-  www/
-    js/
-    css/
-```
   
  
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `cord` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:cord, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/cord>.
 
