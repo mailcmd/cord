@@ -18,7 +18,7 @@ const config = {
             title: document.head.querySelector('title').innerText
         },
         main: {
-            token: null,
+            token: syslib.get_cookie('token'),
             loading: true,
             username: ""
         },

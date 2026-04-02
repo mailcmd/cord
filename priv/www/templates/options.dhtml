@@ -10,7 +10,7 @@
         <label class="mt-10">
           <input
             name="${ch}"
-            type="checkbox" onclick="syslib.subscription('${ch}', this.checked)"
+            type="checkbox" onchange="syslib.subscription('${ch}', this.checked)"
             role="switch" :checked=${subs.includes(ch)} />
           Channel <strong>${ch}</strong>
         </label>

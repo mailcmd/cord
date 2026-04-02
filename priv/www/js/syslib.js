@@ -86,6 +86,11 @@ function Syslib() {
     // Public API
     /////////////////////////////////////////////////////////////////////////////////
 
+    // I need to do public these 3 functions
+    this.set_cookie = set_cookie;
+    this.get_cookie = get_cookie;
+    this.delete_cookie = delete_cookie;
+    
     this.show_loading = function(text = 'Loading...') {
         $CORD.set('loading:message', text);
         $CORD.set('main:loading', true);
