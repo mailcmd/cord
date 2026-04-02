@@ -118,7 +118,10 @@ defmodule CORD.ChannelsMaster do
   end
 
   def handle_call(:list_channels, _from, table) do
-    current_channels = get_available_channels(table)
+    current_channels =
+      table
+      |> get_available_channels()
+      |> Enum.filter(&(&1 != :broadcast))
     {:reply, current_channels, table}
   end
 

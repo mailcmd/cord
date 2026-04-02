@@ -61,6 +61,7 @@ defmodule MessagesManager do
           |> put_in(["token"], token)
           |> put_in(["pass"], "*******")
           |> put_in(["subs"], ChannelsMaster.get_client_channels(msg["user"]))
+          |> put_in(["channels"], ChannelsMaster.list_channels())
 
         :error ->
           store({msg["user"], :token}, nil)
@@ -75,34 +76,42 @@ defmodule MessagesManager do
   end
 
   def process_message(%{"action" => "subscribe"} = msg, state) do
+    {_, username} = get_token_info(msg["token"])
     msg =
       with %{"session_ok" => true} <- check_session(msg, state),
-           {_, username} <- get_token_info(msg["token"]),
            [:ok] <- ChannelsMaster.subscribe(username, String.to_atom(msg["channel"])) do
-        put_in(msg, ["result_ok"], true)
+        msg
+        |> put_in(["result_ok"], true)
+        |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
       else
         %{"session_ok" => false} = msg ->
-          put_in(msg, ["result_ok"], false)
+          msg
 
         _ ->
-          put_in(msg, ["result_ok"], false)
+          msg
+          |> put_in(["result_ok"], false)
+          |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
       end
 
     reply(state, msg)
   end
 
   def process_message(%{"action" => "unsubscribe"} = msg, state) do
+    {_, username} = get_token_info(msg["token"])
     msg =
       with %{"session_ok" => true} <- check_session(msg, state),
-           {_, username} <- get_token_info(msg["token"]),
            :ok <- ChannelsMaster.unsubscribe(username, String.to_atom(msg["channel"])) do
-        put_in(msg, ["result_ok"], true)
+        msg
+        |> put_in(["result_ok"], true)
+        |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
       else
         %{"session_ok" => false} = msg ->
-          put_in(msg, ["result_ok"], false)
+          msg
 
         _ ->
-          put_in(msg, ["result_ok"], false)
+          msg
+          |> put_in(["result_ok"], false)
+          |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
       end
 
     reply(state, msg)
@@ -166,6 +175,7 @@ defmodule MessagesManager do
         msg
         |> put_in(["session_ok"], true)
         |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
+        |> put_in(["channels"], ChannelsMaster.list_channels())
 
       {:renew, new_token} ->
         store({username, :token}, new_token)
@@ -174,6 +184,7 @@ defmodule MessagesManager do
         |> put_in(["session_ok"], true)
         |> put_in(["token"], new_token)
         |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
+        |> put_in(["channels"], ChannelsMaster.list_channels())
 
       :error ->
         store({username, :token}, nil)

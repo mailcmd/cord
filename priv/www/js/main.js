@@ -24,7 +24,8 @@ const config = {
         },
         options: {
             visible: false,
-            channels: []
+            channels: [],
+            subs: []
         }
     }
 };

@@ -1,10 +1,21 @@
 <cord-template cord-tpl-id="tpl-options">
   <section visible="${visible}">
-    <header>#{main:user}</header>
-    <ul>
-      :foreach ch in channels :do
-      <li>${ch}</li>
-      :endforeach
-    </ul>
+    <header
+      style="padding: 0.5rem !important;background-color: var(--spi6);border-radius: 10px;margin-bottom: 0.3rem;">
+      User: <strong><i>#{main:user}</i></strong>
+    </header>
+    <article>
+      <fieldset>
+        :foreach ch in channels :do
+        <label class="mt-10">
+          <input
+            name="${ch}"
+            type="checkbox" onclick="syslib.subscription('${ch}', this.checked)"
+            role="switch" :checked=${subs.includes(ch)} />
+          Channel <strong>${ch}</strong>
+        </label>
+        :endforeach
+      </fieldset>
+    </article>
   </section>
 </cord-template>

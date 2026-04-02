@@ -12,9 +12,17 @@
       </ul>
       <ul>
         <li>
-          <button class="primary"
-                  onclick="$CORD.set('options:visible', !$CORD.get('options:visible'))">
-            <i class="icon menu font-120"></i>
+          <button
+            class="primary mr-2"
+            onclick="$CORD.set('options:visible', !$CORD.get('options:visible'))">
+            <i class="icon icon-menu font-120"></i>
+          </button>
+        </li>
+        <li>
+          <button
+            class="primary"
+            onclick="syslib.logout()">
+            <i class="icon icon-logout font-120"></i>
           </button>
         </li>
       </ul>

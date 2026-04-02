@@ -56,6 +56,11 @@ function Syslib() {
         case 'add_channel':
             $CORD.update_object('options', 'channels', {action: 'push', datas: [msg.target]})
             break;
+        case 'remove_channel':
+            const channels = $CORD.get('options:channels');
+            const i = channels.indexOf(msg.target);
+            $CORD.update_object('options', 'channels', {action: 'remove', datas: [i]})
+            break;
         }
     };
 
@@ -102,9 +107,14 @@ function Syslib() {
                 this.hide_loading();
                 if (msg.token) {
                     // login ok
-                    $CORD.set("main:token", msg.token)
-                    $CORD.set("main:user", user)
-                    $CORD.set('options:channels', msg.subs);
+                    $CORD.update('main', {
+                        token: msg.token,
+                        user: user
+                    });                        
+                    $CORD.update('options', {
+                        channels: msg.channels,
+                        subs: msg.subs
+                    });                    
                     set_cookie('token', msg.token);
                     set_cookie('user', user);
                 } else {
@@ -113,6 +123,13 @@ function Syslib() {
                 }
             }
         );
+    };
+
+    this.logout = function() {
+        $CORD.set('main:token', null);
+        $CORD.set("main:user", '')
+        delete_cookie('token');
+        delete_cookie('user');
     };
 
     this.check_session = function() {
@@ -132,15 +149,28 @@ function Syslib() {
                     $CORD.set('main:token', null);
                     $CORD.set("login:error", "Session exired!")
                 } else {
-                    $CORD.set('main:token', token);
-                    $CORD.set('main:user', get_cookie('user'));
-                    $CORD.set('options:channels', msg.subs);
+                    $CORD.update('main', {
+                        token: token,
+                        user: get_cookie('user')
+                    });                        
+                    $CORD.update('options', {
+                        channels: msg.channels,
+                        subs: msg.subs
+                    });                    
                 }
                 this.hide_loading();
             }
         );
     };
 
+    this.subscription = function(channel, status) {
+        if (status) {
+            this.subscribe(channel);
+        } else {
+            this.unsubscribe(channel);
+        }
+    };
+    
     this.subscribe = function(channel) {
         send(
             'subscribe',
@@ -149,6 +179,7 @@ function Syslib() {
                 if (!msg.result_ok) {
                     notify.warn(`Subscription to channel '${channel}' failed!`);
                 } else {
+                    $CORD.set('options:subs', msg.subs)
                     notify.log(`Subscription to channel '${channel}' ok!`);
                 }
             }
@@ -163,6 +194,7 @@ function Syslib() {
                 if (!msg.result_ok) {
                     notify.warn(`Unsubscription from channel '${channel}' failed!`);
                 } else {
+                    $CORD.set('options:subs', msg.subs)
                     notify.log(`Unsubscription from channel '${channel}' ok!`);
                 }
             }

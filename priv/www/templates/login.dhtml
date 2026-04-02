@@ -6,7 +6,7 @@
         <hgroup class="header primary">
           <div class="flex vertical-align-center" style="justify-content: space-between">
             <div class="inline float-left"><img src="@images/iso.png"/></div>
-            <h3 class="inline float-right">#{header:title}</h3>
+            <h3 class="inline float-right ml-2">#{header:title}</h3>
           </div>
         </hgroup>
         :if error != '' :do

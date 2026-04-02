@@ -154,6 +154,18 @@ nav li {
     padding-bottom: 0.2rem;
 }
 
+.mt-10 {
+    margin-top: 1rem;
+}
+
+.ml-2 {
+    margin-left: 0.2rem;
+}
+
+.mr-2 {
+    margin-right: 0.2rem;
+}
+
 .w-10 {
     width: 10%;
 }
@@ -330,6 +342,10 @@ i.icon {
     font-style: normal;
 }
 
-i.icon.menu::before {
+i.icon.icon-menu::before {
     content: "≣";
+}
+
+i.icon.icon-logout::before {
+    content: ">";
 }

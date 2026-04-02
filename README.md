@@ -52,6 +52,8 @@
    - [x] Create a custom element cord-container to invoke a cord-template 
    - [ ] cord-style tag to load css and create superclasses.
    - [x] foreach and if parser while loop make security exit (max nested depth)
+   - [ ] If inside foreach 
+   - [ ] Attributes type 'disabled' or 'checked'
    
 ## SERVER
    - [ ] For CORD-server define a way to add extra headers to index.html
@@ -59,9 +61,9 @@
 ## WEBSOCKET
    - [x] Define format for direct server update of cord_containers
    - [x] Client subscribe to channels on server
-   - [ ] Server send news to clients
-   - [ ] Broadcast channel, all clients subscribed automatically.
-   - [ ] Send broadcast to notify about channels add/remove 
+   - [x] Server send news to clients
+   - [x] Broadcast channel, all clients subscribed automatically.
+   - [x] Send broadcast to notify about channels add/remove 
    
 
 
