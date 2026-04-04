@@ -1,5 +1,7 @@
 const markers = {};
 var map;
+var first_time = true;
+
 
 function Syslib() {
     const $this = this;
@@ -57,21 +59,29 @@ function Syslib() {
 
     const init_session = function(user, msg) {
         // login ok
-        $CORD.update('main', {
-            token: msg.token,
-            user: user
-        });                        
-        $CORD.update('options', {
-            channels: msg.channels,
-            subs: msg.subs
-        });                    
-        // cookies
-        set_cookie('token', msg.token);
-        set_cookie('user', user);
+        if ($CORD.$.main.token != msg.token) {
+            $CORD.update('main', {
+                token: msg.token,
+                user: user
+            });
+            // cookies
+            set_cookie('token', msg.token);
+            set_cookie('user', user);
+        }
+
+        if ($CORD.$.options.channels != msg.channels || $CORD.$.options.subs != msg.subs) {
+            $CORD.update('options', {
+                channels: msg.channels,
+                subs: msg.subs
+            });
+        }
+
+        // load config if it is first time
+        if (first_time) $this.load_config();
 
         // init map
         if (!map) $this.map_load(msg.lat, msg.lng);
-        $this.load_config();
+        first_time = false;
     };
 
     /////////////////////////////////////////////////////////////////////////////////
@@ -231,12 +241,13 @@ function Syslib() {
     };
 
     this.check_session = function() {
+        console.log('CHECK_SESSION')
         const token = get_cookie('token');
         if (token === null) {
             this.hide_loading();
             return;
         }
-        this.show_loading('Checking session opened...');
+        // this.show_loading('Checking session opened...');
 
         send(
             'check_session',
