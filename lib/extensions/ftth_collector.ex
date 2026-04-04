@@ -147,7 +147,7 @@ defmodule FTTH.Collector do
   def collect_nodes(%{childs: []}), do: :ok
   def collect_nodes(%{childs: childs, id: id}) do
     node_data = get_node_data(id)
-    if (node_data.status != 1) do
+    if (node_data.status == :up) do
       Logger.log(
         :warning,
         "[Collector]:[FTTH] Node #{node_data.descripcion} (id: #{id}) is UP"
