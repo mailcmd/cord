@@ -1,3 +1,9 @@
+/*
+  TODO:
+  - [x] Load/save config, permanent by user
+  - [ ] Keep permanent register of active alerts
+ */
+
 document.querySelector('html').setAttribute('data-theme', 'dark');
 
 const config = {
@@ -5,7 +11,8 @@ const config = {
     strict: true,
     websocket: {
         url: 'ws://localhost:8080/websocket',
-        onmessage: syslib.onmessage
+        onmessage: syslib.onmessage,
+        reconnect_delay: 3000
     },
     containers: {
         loading: {
@@ -20,12 +27,23 @@ const config = {
         main: {
             token: syslib.get_cookie('token'),
             loading: true,
-            username: ""
+            user: '',
+            map_visible: false,
+            alerts: []
         },
         options: {
             visible: false,
             channels: [],
-            subs: []
+            subs: [],
+            colors: [
+                'yellow',
+                'red',
+                'green',
+                'blue',
+                'blueviolet',
+                'coral',
+                'darkorange'
+            ]
         }
     }
 };
@@ -37,7 +55,4 @@ window.addEventListener('cordready', e => {
 window.addEventListener('cordwebsocketready', e => {
     syslib.check_session();
 });
-
-
-    
 

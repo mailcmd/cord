@@ -1,4 +1,8 @@
+const markers = {};
+var map;
+
 function Syslib() {
+    const $this = this;
     /////////////////////////////////////////////////////////////////////////////////
     // Private
     /////////////////////////////////////////////////////////////////////////////////
@@ -51,22 +55,82 @@ function Syslib() {
         },
     };
 
-    const attend_broadcast = function(msg) {
-        switch (msg.action) {
-        case 'add_channel':
-            $CORD.update_object('options', 'channels', {action: 'push', datas: [msg.target]})
-            break;
-        case 'remove_channel':
-            const channels = $CORD.get('options:channels');
-            const i = channels.indexOf(msg.target);
-            $CORD.update_object('options', 'channels', {action: 'remove', datas: [i]})
-            break;
-        }
+    const init_session = function(user, msg) {
+        // login ok
+        $CORD.update('main', {
+            token: msg.token,
+            user: user
+        });                        
+        $CORD.update('options', {
+            channels: msg.channels,
+            subs: msg.subs
+        });                    
+        // cookies
+        set_cookie('token', msg.token);
+        set_cookie('user', user);
+
+        // init map
+        if (!map) $this.map_load(msg.lat, msg.lng);
+        $this.load_config();
     };
 
     /////////////////////////////////////////////////////////////////////////////////
     // Default message receiver
     /////////////////////////////////////////////////////////////////////////////////
+    const attend_broadcast = function(msg) {
+        switch (msg.action) {
+        case 'add_channel':
+            $CORD.update_object(
+                'options',
+                'channels',
+                {action: 'push', datas: [msg.target]}
+            );
+            break;
+        case 'remove_channel':
+            const channels = $CORD.get('options:channels');
+            const i = channels.indexOf(msg.target);
+            $CORD.update_object(
+                'options',
+                'channels',
+                {action: 'remove', datas: [i]}
+            );
+            break;
+        }
+    };
+
+    const attend_events = function(msg) {
+        let i;
+        switch (msg.action) {
+        case 'add_alert':
+            i = $CORD.$.options.channels.findIndex( c => c == msg.channel);
+            $CORD.update_object('main', 'alerts', {
+                action: 'push',
+                datas: [{
+                    channel: msg.channel,
+                    ...msg.alert,
+                    color: $CORD.$.options.colors[i]
+                }]
+            });
+            $this.map_add_circle(
+                msg.alert.lat,
+                msg.alert.lng,
+                msg.alert.rad,
+                msg.alert.name,
+                $CORD.$.options.colors[i]
+            );
+            break;
+            
+        case 'remove_alert':
+            i = $CORD.$.main.alerts.findIndex(a => a.name == msg.alert.name);
+            $CORD.update_object('main', 'alerts', {
+                action: 'remove',
+                datas: [i]
+            });
+            $this.map_remove_circle(msg.alert.name);
+            break;
+        }
+    };
+
     this.onmessage = function(msg) {
         console.log('SYSLIB_ONMESSAGE', msg)
         switch (msg.channel) {
@@ -74,11 +138,9 @@ function Syslib() {
             attend_broadcast(msg);
             break;
 
-        case '':
-            break
-
         default:
-            console.warn(`TODO: manage messages to channel = ${msg.channel} - msg:`, msg)
+            attend_events(msg);
+            break;
         }
     };
 
@@ -90,6 +152,46 @@ function Syslib() {
     this.set_cookie = set_cookie;
     this.get_cookie = get_cookie;
     this.delete_cookie = delete_cookie;
+
+    this.save_config = function() {
+        const config = {
+            options: {
+                subs: $CORD.$.options.subs,
+                colors: $CORD.$.options.colors
+            }
+        };
+        send('save_config', {user: $CORD.$.main.user, config: config}, msg => {
+            if (msg.result_ok) {
+                notify.log("Config saved ok!")
+            } else {
+                notify.error("Config save failed!")
+            }
+        });
+    };
+
+    this.load_config = function() {
+        send('load_config', {user: $CORD.$.main.user}, msg => {
+            for (let cord_id in msg.config) {
+                $CORD.update(cord_id, msg.config[cord_id]);
+            }
+        });
+    };
+
+    this.refresh_color = function(channel, value) {
+        const i = $CORD.$.options.channels.findIndex( c => c == channel);
+        $CORD.$.options.$colors[i] = value;
+        for (let a of $CORD.$.main.alerts) {
+            a.color = value;
+            $this.map_add_circle(
+                a.lat,
+                a.lng,
+                a.rad,
+                a.name,
+                a.color
+            );
+        }
+        $CORD.refresh('main');
+    };
     
     this.show_loading = function(text = 'Loading...') {
         $CORD.set('loading:message', text);
@@ -112,16 +214,7 @@ function Syslib() {
                 this.hide_loading();
                 if (msg.token) {
                     // login ok
-                    $CORD.update('main', {
-                        token: msg.token,
-                        user: user
-                    });                        
-                    $CORD.update('options', {
-                        channels: msg.channels,
-                        subs: msg.subs
-                    });                    
-                    set_cookie('token', msg.token);
-                    set_cookie('user', user);
+                    init_session(user, msg);
                 } else {
                     // login fail
                     $CORD.set("login:error", "Incorrect user or password!")
@@ -150,18 +243,13 @@ function Syslib() {
             {token: token},
             msg => {
                 if (!msg.token) {
-                    // This block is never reached (cord-update message is intercepted)
+                    // This block is never reached
+                    // (cord-update message is intercepted)
                     $CORD.set('main:token', null);
                     $CORD.set("login:error", "Session exired!")
                 } else {
-                    $CORD.update('main', {
-                        token: token,
-                        user: get_cookie('user')
-                    });                        
-                    $CORD.update('options', {
-                        channels: msg.channels,
-                        subs: msg.subs
-                    });                    
+                    // session open 
+                    init_session(get_cookie('user'), msg);
                 }
                 this.hide_loading();
             }
@@ -228,6 +316,42 @@ function Syslib() {
             callback
         );
     };
+
+    this.map_load = function(lat, lng) {
+        map = L.map('map-board').setView([lat, lng], 12);
+        L.tileLayer(
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+            {
+                maxZoom: 18,
+                attribution: '&copy; OpenStreetMap',
+                zoomControl: false,
+                ext: 'png'
+            }
+        ).addTo(map);
+        map.zoomControl.remove();
+    };
+
+    this.map_clear_circles = function() {
+        for (let n in markers) { markers[n].remove() }
+    };
+    
+    this.map_add_circle = function(lat, lng, rad, text, color) {
+        this.map_remove_circle(text);
+        let circle = L.circle([lat, lng], {
+            color: '#555',
+            weight: 1,
+            fillColor: color,
+            fillOpacity: 0.7,
+            radius: rad
+        }).addTo(map);
+        circle.bindPopup(text);
+        markers[text] = circle;
+    };
+    
+    this.map_remove_circle = function(text) {
+        markers[text] && markers[text].remove()
+    };
+    
 }
 
 const syslib = new Syslib();

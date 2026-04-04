@@ -7,12 +7,20 @@
     <article>
       <fieldset>
         :foreach ch in channels :do
-        <label class="mt-10">
+        <label class="mt-10 w-100">
           <input
             name="${ch}"
-            type="checkbox" onchange="syslib.subscription('${ch}', this.checked)"
+            type="checkbox"
+            onchange="syslib.subscription('${ch}', this.checked);syslib.save_config()"
             role="switch" :checked=${subs.includes(ch)} />
           Channel <strong>${ch}</strong>
+          <input
+            type="color"
+            class="float-right pointer"
+            name="favcolor"
+            onchange="syslib.refresh_color('${ch}', this.value);
+                      syslib.save_config();"
+            value="${colors[ch_i]}"> 
         </label>
         :endforeach
       </fieldset>

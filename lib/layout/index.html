@@ -4,8 +4,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>#{title}</title>
 
-  #{(for css <- css_files,
-                do: "<link rel='stylesheet' type='text/css' href='@#{css}'>") |> Enum.join("\n")}
+  #{for css <- css_files do
+    if String.slice(css, 0..3) == "http" do
+      "<link rel='stylesheet' type='text/css' href='#{css}'>"
+    else 
+      "<link rel='stylesheet' type='text/css' href='@#{css}'>"
+    end
+  end |> Enum.join("\n")}
   <style>
     nocscript[cord-id] {
         display: none;
@@ -18,7 +23,11 @@
   #{main}
   <!-- page end -->
   #{for js <- js_files do
-    "<script type='text/javascript' src='@#{js}'></script>"
+    if String.slice(js, 0..3) == "http" do
+      "<script type='text/javascript' src='#{js}'></script>"
+    else 
+      "<script type='text/javascript' src='@#{js}'></script>"
+    end
   end |> Enum.join("\n")}
   <script src="cord-js"></script>
 </body>

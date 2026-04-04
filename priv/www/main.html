@@ -7,8 +7,15 @@
 
 <cord-container cord-id="header" cord-tpl-ref="tpl-header"></cord-container>
 
-<main class="container" cord-id="main">
-  Acá va toda la papa...
+<main cord-id="main">
+  <div id="box-board" class="main-container">
+    :foreach box in alerts :do
+    <div class="alert-box" style="background-color: ${box.color};">
+      ${box.name}
+    </div>
+    :endforeach
+  </div>
+  <div id="map-board" class="main-container h-100" :visible="${map_visible}"></div>
 </main>
 
 <cord-container cord-id="login" cord-tpl-ref="tpl-login"></cord-container>

@@ -14,7 +14,14 @@
         <li>
           <button
             class="primary mr-2"
-            onclick="$CORD.set('options:visible', !$CORD.get('options:visible'))">
+            onclick="$CORD.toggle('main:map_visible')">
+            <i class="icon icon-map font-120"></i>
+          </button>
+        </li>
+        <li>
+          <button
+            class="primary mr-2"
+            onclick="$CORD.toggle('options:visible')">
             <i class="icon icon-menu font-120"></i>
           </button>
         </li>

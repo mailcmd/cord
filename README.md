@@ -53,7 +53,7 @@
    - [ ] cord-style tag to load css and create superclasses.
    - [x] foreach and if parser while loop make security exit (max nested depth)
    - [ ] If inside foreach 
-   - [ ] Attributes type 'disabled' or 'checked'
+   - [x] Attributes type 'disabled' or 'checked'
    
 ## SERVER
    - [ ] For CORD-server define a way to add extra headers to index.html

@@ -38,6 +38,6 @@
   </dialog>
   :endif
   <cord-script-after-render>
-    login.elements[0].focus();
+    document.querySelector('#login').elements[0].focus();
   </cord-script-after-render>
 </cord-template>

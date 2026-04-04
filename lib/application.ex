@@ -30,6 +30,8 @@ defmodule CORD.Application do
           Keyword.get(@local_config, :websocket_manager)
         }               
       },
+      # Permanent Storage
+      {CORD.PermanentStorage, []},      
       # User defined APP 
       @local_config[:app_supervisor]
     ]

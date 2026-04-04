@@ -108,18 +108,31 @@ html[data-scheme="dark"] {
     --spi6: #071C2C;
 }
 
-body, main {
+html, body, main {
     width: 100%;
     height: 100%;
-    padding: 0;
+    padding: 0 !important;
     margin: 0;
+    user-select: none;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
 }
 
 header {
+    min-height: 3.5rem;
     text-align: center;
     padding: 0;
     margin: 0;
     padding-block: 0 !important;
+}
+
+main {
+    position: relative;
+    flex-grow: 1;
+    overflow: auto;
 }
 
 h1, h2, h3, h4, h5 {
@@ -143,7 +156,27 @@ nav li {
     padding: 0;
 }
 
+input[type="color"] {
+    position: relative;
+    width: 2.3rem;
+    padding: 0;
+    height: 1.3rem;
+    margin: 0;
+    float: right;    
+}
+
 /* classes */
+
+.pointer {
+    cursor: pointer;
+}
+
+.z-0 {
+    z-index: 0;
+}
+.z-1 {
+    z-index: 1;
+}
 
 .bg-spi4 {
     background-color: var(--spi4);
@@ -164,6 +197,10 @@ nav li {
 
 .mr-2 {
     margin-right: 0.2rem;
+}
+
+.h-100 {
+    height: 100%;
 }
 
 .w-10 {
@@ -194,7 +231,7 @@ nav li {
     width: 90%;
 }
 .w-100 {
-    width: 100%;
+    width: 100% !important;
 }
 
 .font-110 {
@@ -305,11 +342,40 @@ nav li {
 
 cord-container[cord-id="loading"] {
     position: relative;
-    z-index: 2;    
+    z-index: 3;    
 }
 cord-container[cord-id="login"] {
     position: relative;
+    z-index: 2;
+}
+
+cord-container[cord-id="options"] {
+    position: relative;
     z-index: 1;
+}
+
+main[cord-id="main"] {
+    position: relative;
+    z-index: 0;
+}
+
+main[cord-id="main"] > div.main-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    display: flex;
+    padding: 0.5rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    transition-property: translate;
+    transition-duration: 0.2s;
+}
+
+main[cord-id="main"] > div.main-container#map-board:not([visible]) {
+    translate: -100%;
 }
 
 cord-container[cord-id="options"] > section {    
@@ -329,6 +395,17 @@ cord-container[cord-id="options"] > section[visible="true"] {
     translate: 0;
 }
 
+div.alert-box {
+    padding: 0.5rem;
+    background-color: yellow;
+    color: black;
+    border-radius: 1rem;
+    margin: 0.2rem;
+    height: fit-content;
+    font-weight: bolder;
+    text-wrap: nowrap;
+}
+
 /* icons */
 button i.icon {
     font-size: 115%;
@@ -336,6 +413,15 @@ button i.icon {
 
 button:has(i.icon) {
     padding: 0.3rem 0.7rem;
+}
+
+header button:has(i.icon) {
+    background-color: transparent;
+}
+
+header button:has(i.icon):is(:active, :focus) {
+    background-color: transparent;
+    border-color: var(--pico-primary-border);
 }
 
 i.icon {
@@ -348,4 +434,8 @@ i.icon.icon-menu::before {
 
 i.icon.icon-logout::before {
     content: ">";
+}
+
+i.icon.icon-map::before {
+    content: "▦";
 }

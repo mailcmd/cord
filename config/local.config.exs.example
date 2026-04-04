@@ -4,7 +4,6 @@ config :cord, :local_config,
     websocket_manager: WebsocketManager,
     app_supervisor: SPIDownDetector,
     events_pop_interval: 5_000,
-    
     title: "SPI Down Detector",
     main_file: "main.html",
     css_files: [
@@ -18,6 +17,8 @@ config :cord, :local_config,
 
 config :cord, :spi_down_detector,
     token_expire: 600, # in seconds, default 3600 secs
+    lat: -38.706895351298776,
+    lng: -62.25236026480962,
     db: [
       hostname: "190.1.0.83",
       database: "spi40db",

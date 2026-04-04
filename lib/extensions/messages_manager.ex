@@ -2,6 +2,7 @@ defmodule MessagesManager do
   use CORD.Websocket.Manager
 
   alias CORD.ChannelsMaster
+  alias CORD.PermanentStorage
 
   @sdd_config Application.compile_env(:cord, :spi_down_detector)
 
@@ -41,6 +42,7 @@ defmodule MessagesManager do
     channel
     |> ChannelsMaster.get_channel_clients()
     |> Enum.map(fn user -> recover({user, :pid}) end)
+    |> Enum.filter(&(&1 != nil))
   end
 
   ################################################################################################
@@ -62,6 +64,8 @@ defmodule MessagesManager do
           |> put_in(["pass"], "*******")
           |> put_in(["subs"], ChannelsMaster.get_client_channels(msg["user"]))
           |> put_in(["channels"], ChannelsMaster.list_channels())
+          |> put_in(["lat"], Keyword.fetch!(@sdd_config, :lat))
+          |> put_in(["lng"], Keyword.fetch!(@sdd_config, :lng))
 
         :error ->
           store({msg["user"], :token}, nil)
@@ -147,6 +151,38 @@ defmodule MessagesManager do
     reply(state, msg)
   end
 
+  def process_message(%{"action" => "save_config"} = msg, state) do
+    msg =
+      with %{"session_ok" => true} <- check_session(msg, state),
+           :ok <-  PermanentStorage.set({msg["user"], :config}, msg["config"]) do
+        put_in(msg, ["result_ok"], true)
+      else
+        %{"session_ok" => false} = msg ->
+          msg
+        
+        _ ->
+          put_in(msg, ["result_ok"], false)
+      end
+
+    reply(state, msg)
+  end
+
+  def process_message(%{"action" => "load_config"} = msg, state) do
+    msg =
+      with %{"session_ok" => true} <- check_session(msg, state),
+           config when is_map(config) <-  PermanentStorage.get({msg["user"], :config}) do
+        put_in(msg, ["config"], config)
+      else
+        %{"session_ok" => false} = msg ->
+          msg
+        
+        _ ->
+          put_in(msg, ["config"], %{})
+      end
+
+    reply(state, msg)
+  end
+
   ################################################################################################
   # Fallback function
   ################################################################################################
@@ -176,6 +212,8 @@ defmodule MessagesManager do
         |> put_in(["session_ok"], true)
         |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
         |> put_in(["channels"], ChannelsMaster.list_channels())
+        |> put_in(["lat"], Keyword.fetch!(@sdd_config, :lat))
+        |> put_in(["lng"], Keyword.fetch!(@sdd_config, :lng))
 
       {:renew, new_token} ->
         store({username, :token}, new_token)
@@ -185,6 +223,8 @@ defmodule MessagesManager do
         |> put_in(["token"], new_token)
         |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
         |> put_in(["channels"], ChannelsMaster.list_channels())
+        |> put_in(["lat"], Keyword.fetch!(@sdd_config, :lat))
+        |> put_in(["lng"], Keyword.fetch!(@sdd_config, :lng))
 
       :error ->
         store({username, :token}, nil)
