@@ -54,5 +54,6 @@ window.addEventListener('cordready', e => {
 
 window.addEventListener('cordwebsocketready', e => {
     syslib.check_session();
+    setInterval(syslib.check_session, 30000);
 });
 

@@ -1,12 +1,13 @@
-defmodule Collector.Helpers do
- 
-  def register(_node, :down) do
-  end
-  def register(_node, :up) do    
+defmodule Collector.Helpers do 
+  alias CORD.ChannelsMaster
+  alias CORD.PermanentStorage
+
+  def register(node, status) do
+    PermanentStorage.set({:alert, node.description}, status)
   end
 
   def notify(_node, :up) do
-    CORD.ChannelsMaster.push_event(
+    ChannelsMaster.push_event(
       :ftth,
       %{
         action: "add_alert",
@@ -21,7 +22,7 @@ defmodule Collector.Helpers do
     )
   end
   def notify(_node, :down) do
-    CORD.ChannelsMaster.push_event(
+    ChannelsMaster.push_event(
       :ftth,
       %{
         action: "remove_alert",

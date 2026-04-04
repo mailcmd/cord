@@ -1,4 +1,6 @@
 defmodule FTTH.Collector do
+  alias CORD.PermanentStorage
+  
   @collector_config Application.compile_env(:cord, :ftth_collector)
 
   @start_delay Keyword.get(@collector_config, :start_delay, 5000)
@@ -115,7 +117,7 @@ defmodule FTTH.Collector do
 
       # The node is UP because there is enough ONU online
       get_probes_statuses(ids_onus) > @node_up_thresold ->
-        if (node_data.status != 1) do
+        if (node_data.status == :up) do
           Logger.log(
             :warning,
             "[Collector]:[FTTH] Node #{node_data.descripcion} (id: #{id}) is UP"
@@ -128,7 +130,7 @@ defmodule FTTH.Collector do
         collect_nodes(%{childs: childs})
 
       true ->
-        if (node_data.status == 1) do
+        if (node_data.status == :down) do
           Logger.log(
             :warning,
             "[Collector]:[FTTH] Node #{node_data.descripcion} (id: #{id}) is DOWN"
@@ -242,20 +244,14 @@ defmodule FTTH.Collector do
         :timer.sleep(@node_delay)
         get_node_data(id, count - 1)
       {[info], _} ->
-        conn = PgSQL.Conn.get(:ns2)
-        nodes = PgSQL.query(conn, """
-          SELECT
-              status
-            FROM
-              nodes
-            WHERE
-              node = '#{info.descripcion}'
-        """)
-        nodes = nodes == [] && [%{status: 1}] || nodes
-        put_in(info, [:status], nodes |> hd() |> Map.get(:status))
+        status = get_alert_status(info.descripcion)
+        put_in(info, [:status], status)
     end
   end
 
+  def get_alert_status(node_description) do
+    PermanentStorage.get({:alert, node_description}) || :up
+  end
   ################################################################################################
   ## Tools
   ################################################################################################
