@@ -2,8 +2,12 @@ defmodule Collector.Helpers do
   alias CORD.ChannelsMaster
   alias CORD.PermanentStorage
 
-  def register(node, status) do
-    PermanentStorage.set({:alert, node.description}, status)
+  def register(node, :down) do
+    PermanentStorage.set({:alert, node.description}, node)
+  end
+
+  def register(node, :up) do
+    PermanentStorage.remove({:alert, node.description})
   end
 
   def notify(_node, :up) do

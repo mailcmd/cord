@@ -171,7 +171,11 @@ defmodule MessagesManager do
     msg =
       with %{"session_ok" => true} <- check_session(msg, state),
            config when is_map(config) <-  PermanentStorage.get({msg["user"], :config}) do
-        put_in(msg, ["config"], config)
+        msg
+        |> put_in(["config"], config)
+        |> put_in(["config", "main", "alerts"],
+                  PermanentStorage.get_matchs({{:alert, :_}, :"$1"})
+        )
       else
         %{"session_ok" => false} = msg ->
           msg

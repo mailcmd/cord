@@ -69,7 +69,8 @@ function Syslib() {
             set_cookie('user', user);
         }
 
-        if ($CORD.$.options.channels != msg.channels || $CORD.$.options.subs != msg.subs) {
+        if (!$CORD.$.options.channels.is_equal(msg.channels)
+            || !$CORD.$.options.subs.is_equal(msg.subs)) {
             $CORD.update('options', {
                 channels: msg.channels,
                 subs: msg.subs

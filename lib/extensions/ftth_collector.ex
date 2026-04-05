@@ -250,7 +250,10 @@ defmodule FTTH.Collector do
   end
 
   def get_alert_status(node_description) do
-    PermanentStorage.get({:alert, node_description}) || :up
+    case PermanentStorage.get({:alert, node_description}) do
+      %{} -> :down
+      _ -> :up
+    end
   end
   ################################################################################################
   ## Tools
