@@ -23,9 +23,7 @@ defmodule CORD.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.0"},
-      # Specific
-      {:pg_ex, git: "https://github.com/mailcmd/pg_ex.git" },
-      {:qsnmp, git: "https://github.com/mailcmd/qsnmp.git" },      
+      # Specific for the app below
     ]
   end
 end
