@@ -34,6 +34,7 @@ defmodule MessagesManager do
       |> put_in([:ts], ts)
 
     send_event(pids, event)
+    :timer.sleep(1500)
     process_events(events)
   end
   # helper 
@@ -66,6 +67,7 @@ defmodule MessagesManager do
           |> put_in(["channels"], ChannelsMaster.list_channels())
           |> put_in(["lat"], Keyword.fetch!(@sdd_config, :lat))
           |> put_in(["lng"], Keyword.fetch!(@sdd_config, :lng))
+          |> put_in(["version"], Keyword.fetch!(@sdd_config, :version))
 
         :error ->
           store({msg["user"], :token}, nil)
@@ -173,17 +175,26 @@ defmodule MessagesManager do
            config when is_map(config) <-  PermanentStorage.get({msg["user"], :config}) do
         msg
         |> put_in(["config"], config)
-        |> put_in(["config", "main", "alerts"],
-                  PermanentStorage.get_matchs({{:alert, :_}, :"$1"})
-        )
+        |> put_in(["config", "main"], %{alerts: []})
+        |> put_in(["config", "main", "alerts"], get_active_alerts()) 
+        |> put_in(["version"], Keyword.fetch!(@sdd_config, :version))
       else
         %{"session_ok" => false} = msg ->
           msg
         
         _ ->
-          put_in(msg, ["config"], %{})
+          msg 
+          |> put_in(["config"], %{})
+          |> put_in(["config", "main"], %{alerts: []})
+          |> put_in(["config", "main", "alerts"], get_active_alerts()) 
+          |> put_in(["version"], Keyword.fetch!(@sdd_config, :version))
       end
 
+    reply(state, msg)
+  end
+
+  def process_message(%{"action" => "remove_alert"} = msg, state) do
+    PermanentStorage.remove({:alert, String.to_integer(msg["id"])})
     reply(state, msg)
   end
 
@@ -214,6 +225,7 @@ defmodule MessagesManager do
         store({username, :pid}, state.conn.pid)
         msg
         |> put_in(["session_ok"], true)
+        |> put_in(["user"], username)
         |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
         |> put_in(["channels"], ChannelsMaster.list_channels())
         |> put_in(["lat"], Keyword.fetch!(@sdd_config, :lat))
@@ -224,6 +236,7 @@ defmodule MessagesManager do
         store({username, :pid}, state.conn.pid)
         msg
         |> put_in(["session_ok"], true)
+        |> put_in(["user"], username)
         |> put_in(["token"], new_token)
         |> put_in(["subs"], ChannelsMaster.get_client_channels(username))
         |> put_in(["channels"], ChannelsMaster.list_channels())
@@ -238,7 +251,7 @@ defmodule MessagesManager do
         |> Map.delete("msg_id")
         |> put_in(["token"], nil)
         |> put_in(["containers"], %{
-          main: %{ token: nil, loading: false }
+          main: %{ token: nil, loading: false, first_time: true }
         })
     end
   end
@@ -429,8 +442,14 @@ defmodule MessagesManager do
     |> String.downcase()
   end
 
+  defp get_active_alerts() do
+    PermanentStorage.get_matchs({{:alert, :_}, :"$1"})
+  end
+
   defp send_event([], _), do: :ok
   defp send_event([pid | pids], event) do
+    Logger.log(:notice,
+               "[CORD][Websocket][Processor] Sentding to #{inspect pid} #{inspect event}")
     send(pid, JSON.encode!(event))
     send_event(pids, event)
   end

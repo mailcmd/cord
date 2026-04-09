@@ -74,15 +74,15 @@ defmodule FTTH.Collector do
         _ -> true
       end)
       |> Enum.map(fn {k, _} -> k end)
-      |> Enum.sort()
+      |> Enum.sort() 
 
-    Storage.set({tree, roots})
+   Storage.set({tree, roots})
 
-    collect_nodes()
+   collect_nodes()
 
     # next round
-    :timer.sleep(@node_delay)
-    collector()
+   :timer.sleep(@node_delay)
+   collector()
   end
 
   # Beginnig: starts threads 
@@ -109,35 +109,45 @@ defmodule FTTH.Collector do
     cond do
       # The node is UP because ...
       node_data.lat == 0 ->
-        notify(node_data, :up)
-        register(node_data, :up)
+        notify(node_data, :up, :ftth)
+        register(node_data, :up, :ftth)
         
         :timer.sleep(@node_delay)
         collect_nodes(%{childs: childs})
 
       # The node is UP because there is enough ONU online
       get_probes_statuses(ids_onus) > @node_up_thresold ->
-        if (node_data.status == :up) do
+        if (node_data.status == :down) do
           Logger.log(
             :warning,
-            "[Collector]:[FTTH] Node #{node_data.descripcion} (id: #{id}) is UP"
+            "[Collector]:[FTTH] Node #{node_data.description} (id: #{id}) is UP again"
+          )
+          notify(node_data, :up, :ftth)
+        else
+          Logger.log(
+            :info,
+            "[Collector]:[FTTH] Node #{node_data.description} (id: #{id}) remains UP"
           )
         end
-        notify(node_data, :up)
-        register(node_data, :up)
+        register(node_data, :up, :ftth)
         
         :timer.sleep(@node_delay)
         collect_nodes(%{childs: childs})
 
       true ->
-        if (node_data.status == :down) do
+        if (node_data.status == :up) do
           Logger.log(
             :warning,
-            "[Collector]:[FTTH] Node #{node_data.descripcion} (id: #{id}) is DOWN"
+            "[Collector]:[FTTH] Node #{node_data.description} (id: #{id}) fall DOWN"
+          )
+          notify(node_data, :down, :ftth)
+        else
+          Logger.log(
+            :info,
+            "[Collector]:[FTTH] Node #{node_data.description} (id: #{id}) remains DOWN"
           )
         end
-        notify(node_data, :down)
-        register(node_data, :down)
+        register(node_data, :down, :ftth)
         
         send_broadcast_down_childs(childs)
     end
@@ -147,16 +157,20 @@ defmodule FTTH.Collector do
   def collect_nodes(%{childs: []}), do: :ok
   def collect_nodes(%{childs: childs, id: id}) do
     node_data = get_node_data(id)
-    if (node_data.status == :up) do
+    if (node_data.status == :down) do
       Logger.log(
         :warning,
-        "[Collector]:[FTTH] Node #{node_data.descripcion} (id: #{id}) is UP"
+        "[Collector]:[FTTH] Node #{node_data.description} (id: #{id}) is UP again"
+      )
+      notify(node_data, :up, :ftth)
+    else
+      Logger.log(
+        :info,
+        "[Collector]:[FTTH] Node #{node_data.description} (id: #{id}) remains UP"
       )
     end
+    register(node_data, :up, :ftth)
     
-    notify(node_data, :up)
-    register(node_data, :up)
-
     # Collect childs nodes
     Enum.each(childs, fn child -> collect_nodes(get_in(Storage.get(:tree), [child])) end)
   end
@@ -172,7 +186,7 @@ defmodule FTTH.Collector do
   defp get_probes_statuses([], result),
     do: (result |> Enum.filter(fn r -> r == :up end) |> length()) / length(result)
   defp get_probes_statuses([id_onu | ids_onus], result) do
-    conn = PgSQL.Conn.get(:ftth)
+    conn = PgSQL.Conn.get()
     probe_data = PgSQL.query(conn, """
       SELECT
         estado_servicio(sp.id_locacion_cliente_pack_servicio) status,
@@ -225,9 +239,11 @@ defmodule FTTH.Collector do
     conn = PgSQL.Conn.get()
     info = PgSQL.query(conn, """
       SELECT
-          dis.descripcion,
-          tree.latitud lat,
-          tree.longitud lng
+          tree.id,
+          dis.descripcion as description,
+          tree.latitud::float lat,
+          tree.longitud::float lng,
+          100 as rad
         FROM
           plg_22000_ftth_arbol tree
         JOIN
@@ -239,18 +255,18 @@ defmodule FTTH.Collector do
     case {info, count} do
       {[], 0} ->
         Logger.log(:error, "[Collector]:[FTTH] WHY NODE #{id} HAS NOT DATA???")
-        %{descripcion: "NODE_#{id}", lat: 0, lng: 0, status: nil}
+        %{description: "NODE_#{id}", lat: 0, lng: 0, status: nil, rad: 0}
       {[], count} ->
         :timer.sleep(@node_delay)
         get_node_data(id, count - 1)
       {[info], _} ->
-        status = get_alert_status(info.descripcion)
+        status = get_alert_status(info.id)
         put_in(info, [:status], status)
     end
   end
 
-  def get_alert_status(node_description) do
-    case PermanentStorage.get({:alert, node_description}) do
+  def get_alert_status(node_id) do
+    case PermanentStorage.get({:alert, node_id}) do
       %{} -> :down
       _ -> :up
     end
@@ -263,8 +279,8 @@ defmodule FTTH.Collector do
   defp send_broadcast_down_childs([ id | childs]) do
     Logger.log(:warning, "[Collector]:[FTTH] Node #{id} is DOWN")
     node_data = get_node_data(id)
-    register(node_data, :down)
-    notify(node_data, :down)
+    register(node_data, :down, :ftth)
+    notify(node_data, :down, :ftth)
     send_broadcast_down_childs(get_in(Storage.get(:tree), [id, :childs]))
     send_broadcast_down_childs(childs)
   end

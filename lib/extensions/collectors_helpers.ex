@@ -2,35 +2,35 @@ defmodule Collector.Helpers do
   alias CORD.ChannelsMaster
   alias CORD.PermanentStorage
 
-  def register(node, :down) do
-    PermanentStorage.set({:alert, node.description}, node)
+  def register(node, :up, _channel) do
+    PermanentStorage.remove({:alert, node.id})
   end
 
-  def register(node, :up) do
-    PermanentStorage.remove({:alert, node.description})
+  def register(node, :down, channel) do
+    node =
+      node
+      |> put_in([:ts], System.os_time(:second))
+      |> put_in([:channel], channel)
+      |> Map.delete(:status)
+    PermanentStorage.set({:alert, node.id}, node)
   end
 
-  def notify(_node, :up) do
+  def notify(node, :up, channel) do
     ChannelsMaster.push_event(
-      :ftth,
+      channel,
       %{
-        action: "add_alert",
-        alert:
-          %{
-            name: "Node 28-A-1",
-            lat: -38.737431287414786,
-            lng: -62.23415696375327,
-            rad: 580
-          }
+        action: "remove_alert",
+        alert: %{id: node.id}
       }
     )
   end
-  def notify(_node, :down) do
+  
+  def notify(node, :down, channel) do
     ChannelsMaster.push_event(
-      :ftth,
+      channel,
       %{
-        action: "remove_alert",
-        alert: %{name: "Node 28-A-1"}
+        action: "add_alert",
+        alert: node
       }
     )
   end

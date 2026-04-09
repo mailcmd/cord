@@ -1,0 +1,8 @@
+<cord-template cord-tpl-id="tpl-messages">
+  :if show :do
+  <div id="message-box" style="background-color: ${color}"
+       onclick="$CORD.$.messages.$show = false">
+    ${text}
+  </div>
+  :endif
+</cord-template>

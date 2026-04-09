@@ -7,8 +7,11 @@ config :cord, :http,
        css_dir: "priv/www/css",
        cord_plug_options: []     # These options are passed to Cord.Plug.init/1 function.
 
+config :logger, 
+       level: :notice
+
 config :logger, :default_formatter,
-  format: "$date $time - [$level] $message $metadata\n"
+       format: "$date $time - [$level] $message $metadata\n"
 
 "config/local/*.exs"
 |> Path.wildcard()

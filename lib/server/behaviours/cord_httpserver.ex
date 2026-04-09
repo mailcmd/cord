@@ -37,6 +37,17 @@ defmodule CORD.HTTPServer do
     end	  
   end
 
+	defmacro post(path, do: block) do
+    quote do
+      def call(
+            %{method: "POST", request_path: unquote(path)} = var!(conn),
+            var!(opts)
+          ) do
+        _ = var!(opts)
+        unquote(block)
+      end      
+    end	  
+  end
   ###################################################################################
   # Utils 
   ################################################################################### 

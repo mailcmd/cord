@@ -1,21 +1,25 @@
 import Config
 
 config :cord, :local_config, 
-    websocket_manager: WebsocketManager,
+    websocket_manager: MessagesManager,
     app_supervisor: SPIDownDetector,
     events_pop_interval: 5_000,
+    api_user_pass: "vianet:lowland", # user:pass
     title: "SPI Down Detector",
     main_file: "main.html",
     css_files: [
+      "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
       "css/pico.css",
       "css/main.css"
     ],
     js_files: [
+      "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
       "js/syslib.js",
       "js/main.js"
     ]
 
 config :cord, :spi_down_detector,
+    version: "0.1.0",
     token_expire: 600, # in seconds, default 3600 secs
     lat: -38.706895351298776,
     lng: -62.25236026480962,
@@ -30,4 +34,4 @@ config :cord, :ftth_collector,
     start_delay: 5000,
     node_delay: 500,
     node_up_thresold: 0,
-    threads: 8
+    threads: 12

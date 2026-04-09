@@ -4,7 +4,7 @@
       <ul>
         <li class="font-140 bold">
           <img src="@images/iso.png" style="margin-right: 0.5rem;"/>
-          ${title}
+          <span id="title" version="v${version}">${title}</span>
         </li>
       </ul>
       <ul>
@@ -13,14 +13,14 @@
       <ul>
         <li>
           <button
-            class="primary mr-2"
+            class="primary mr-2"  :active="#{main:map_visible}"
             onclick="$CORD.toggle('main:map_visible')">
             <i class="icon icon-map font-120"></i>
           </button>
         </li>
         <li>
           <button
-            class="primary mr-2"
+            class="primary mr-2" :active="#{options:visible}"
             onclick="$CORD.toggle('options:visible')">
             <i class="icon icon-menu font-120"></i>
           </button>

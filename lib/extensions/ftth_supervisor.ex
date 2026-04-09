@@ -9,7 +9,7 @@ defmodule FTTH.Supervisor do
   def init(_) do
     children = [
       FTTH.Storage,
-      # FTTH.Collector
+      FTTH.Collector
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

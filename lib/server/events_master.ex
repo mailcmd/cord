@@ -16,7 +16,7 @@ defmodule CORD.EventsMaster do
   ################################################################################################
   @impl true
   def init(state) do
-    Logger.log(:info, "[EventsMaster] Initializing events manager...")
+    Logger.log(:notice, "[EventsMaster] Initializing events manager...")
     {:ok, state, {:continue, :schedule_next_run}}
   end
 
@@ -29,6 +29,12 @@ defmodule CORD.EventsMaster do
   @impl true
   def handle_info(:pop_events, {_, event_processor} = state) do
 	  events = ChannelsMaster.pop_all_events()
+    if length(events) > 0 do
+      Logger.log(:notice,
+                 "[EventsMaster] poped #{length(events)} events," <>
+                 " sending to #{inspect event_processor}"
+      )
+    end
     event_processor.process_events(events)
     {:noreply, state, {:continue, :schedule_next_run}}
   end

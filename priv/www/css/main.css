@@ -1,72 +1,3 @@
-:root {
-    --spi: #3591c5;
-    --spi1: #57B5E0;
-    --spi2: #006EC7;
-    --spi3: #00599C;
-    --spi4: #003F70;
-    --spi5: #0B2E49;
-    --smi: #c9d02b;
-    --color-1: var(--spi5);
-    /* #1d1d1d; */
-    --color-2: #d8d8d8;
-    --color-3: var(--spi4);
-    /* #2b2b2b; */
-    --color-4: #adadad;
-    --color-5: #22ff16;
-    --color-6: #868686;
-    --color-7: #525965;
-    --color-8: rgba(42, 42, 42, 0.9);
-    --color-9: #c7c7c7;
-    --color-10: #f2f2f2;
-    --color-11: #454545;
-    --color-12: rgba(81, 81, 81, 0.5);
-    --color-13: rgba(56, 56, 56, 0.5);
-    --color-14: rgba(29, 29, 29, 0.8);
-    --color-15: #383838;
-    --color-16: #e9ecef;
-    --color-17: #fbfbfb;
-    --color-18: #ced4da;
-    --color-19: #0B2E49ed;
-    --color-20: #e9ecef;
-    --text: var(--color-11);
-    /* especiales */
-    --light-danger: #FFB7B7;
-    --light-primary: #99CAFE;
-    --light-secondary: #b3c2ce;
-    --light-success: #82db97;
-    --light-warning: #ffc407;
-    /* sobreescribe el de bootstrap */
-    --yellow: #ffff07;
-    --primary: var(--spi);
-
-    /* palettes */
-    --hue: 0deg;
-    --hue-revert: calc(360deg - var(--hue));
-}
-
-html[data-scheme="dark"] {
-    --white: #071C2C;
-    --text: #E7EAED;
-    --dark: var(--text);
-    --text-2: #C2CBD2;
-    --color-1: #284b66;
-    --color-2: var(--color-1);
-    --color-10: var(--color-1);
-    --color-11: var(--text);
-    --color-12: var(--text-2);
-    --color-14: var(--text);
-    --color-15: var(--text);
-    --color-16: #0A2942;
-    --color-18: var(--color-1);
-    --color-19: #0B2E49ed;
-    --color-20: #546D80;
-    --color-21: #748Da0;
-    --ag-foreground-color: var(--text);
-    --ag-background-color: var(--color-16);
-    --ag-odd-row-background-color: var(--color-16);
-    --ag-row-border-color: var(--color-1);
-}
-
 /* FROM HERE */
 
 [data-theme=light],
@@ -119,6 +50,7 @@ html, body, main {
 body {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 header {
@@ -133,6 +65,16 @@ main {
     position: relative;
     flex-grow: 1;
     overflow: auto;
+}
+
+footer {
+    text-align: right;
+    padding: 0px 7px !important;
+    margin: 0;
+    font-size: smaller;
+    box-shadow: 0px 0px 3px 1px var(--spi3);
+    background-color: var(--spi5);
+    z-index: 1;
 }
 
 h1, h2, h3, h4, h5 {
@@ -354,12 +296,22 @@ cord-container[cord-id="options"] {
     z-index: 1;
 }
 
-main[cord-id="main"] {
+cord-container[cord-id="main"] {
     position: relative;
     z-index: 0;
+    width: 100%;
+    height: 100%;
 }
 
-main[cord-id="main"] > div.main-container {
+cord-container[cord-id="messages"] {
+    z-index: 5;
+}
+
+cord-container[cord-id="context_menu"] {
+    z-index: 5;
+}
+
+cord-container[cord-id="main"] div.main-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -374,7 +326,7 @@ main[cord-id="main"] > div.main-container {
     transition-duration: 0.2s;
 }
 
-main[cord-id="main"] > div.main-container#map-board:not([visible]) {
+cord-container[cord-id="main"] div.main-container#map-board:not([visible]) {
     translate: -100%;
 }
 
@@ -398,12 +350,108 @@ cord-container[cord-id="options"] > section[visible="true"] {
 div.alert-box {
     padding: 0.5rem;
     background-color: yellow;
-    color: black;
+    color: var(--spi5);
     border-radius: 1rem;
     margin: 0.2rem;
     height: fit-content;
     font-weight: bolder;
     text-wrap: nowrap;
+    user-select: text;
+    pointer-events: none;
+    box-shadow: inset 0 0 3px 0 #0008, 0 0 5px 0px #888;
+}
+
+div.alert-box::after {
+    content: "⋮";
+    display: inline-block;
+    position: relative;
+    top: 1px;
+    margin: 0 0.1rem 0 0.3rem;
+    cursor: pointer;
+    opacity: 0.3;
+    pointer-events: all;
+}
+
+#map-board {
+    filter: invert(0.95) brightness(2);
+
+    *[fill="#FAA370"] {
+        filter: invert(0.95) brightness(2);
+    }
+
+    *[fill="#B4FF47"] {
+        filter: invert(1)  brightness(2);
+    }
+}
+
+#map-board *.leaflet-interactive {
+    filter: invert(1) brightness(2);
+}
+
+#message-box {
+    position: fixed;
+    bottom: 2rem;
+    right: 0.6rem;
+    border: 1px solid #111;
+    padding: 0.3rem 0.8rem;
+    border-radius: 14px;
+    z-index: 5;
+    font-size: 85%;
+    font-weight: normal;
+    filter: brightness(1.2);
+    box-shadow: 0 0 2px 0 white;
+    pointer-events: none;
+    color: black;
+}
+
+#message-box::after {
+    content: "✕";
+    pointer-events: all;
+    position: relative;
+    top: 1px;
+    margin-left: 0.4rem;
+    color: #0008;
+    zoom: 1.1;
+    cursor: pointer;
+}
+
+#context-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    background-color: var(--spi5);
+    padding: 0.1rem;
+    border: 1px solid #444;
+    border-radius: 0.4rem;
+    font-size: 70%;
+    text-wrap: nowrap;
+}
+
+#context-menu li {
+    margin: 0.1rem;
+    padding: 0.3rem;
+    background-color: var(--spi4);
+    color: white;
+    cursor: pointer;
+}
+
+#context-menu li:hover {
+    background-color: #444;
+    color: white;
+}
+
+#title {
+    position: relative;
+}
+
+#title::before {
+    content: attr(version);
+    position: absolute;
+    font-size: 40%;
+    bottom: -0.5rem;
+    left: 0.2rem;
+    font-weight: lighter;
 }
 
 /* icons */
@@ -413,6 +461,10 @@ button i.icon {
 
 button:has(i.icon) {
     padding: 0.3rem 0.7rem;
+}
+
+button[active] {
+    background-color: firebrick !important;
 }
 
 header button:has(i.icon) {
@@ -430,12 +482,58 @@ i.icon {
 
 i.icon.icon-menu::before {
     content: "≣";
+    position: relative;
+    top: -2px;
 }
 
 i.icon.icon-logout::before {
-    content: ">";
+    content: "↵";
+    position: relative;
+    top: 0px;
+    transform: rotateY(180deg);
+    display: inline-block;    
 }
 
 i.icon.icon-map::before {
     content: "▦";
+    position: relative;
+    top: -2px;
+}
+
+/* animations */
+
+.in {
+  animation-name: out;
+  animation-direction: reverse;
+  animation-duration: 0.3s;
+}
+
+.out {
+  animation-name: out;
+  animation-duration: 0.3s;
+}
+
+@keyframes out {
+    from {
+        scale: 1 1;
+    }
+    to {
+        scale: 0 0;
+    }
+}
+
+.heartbeat {
+    animation: heartbeat;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    box-shadow: 0 0 5px 1px red !important;
+}
+
+@keyframes heartbeat {
+    0% {
+        scale: 1;
+    }
+    50% {
+        scale: 1.05;
+    }
 }

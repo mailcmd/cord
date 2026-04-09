@@ -1,8 +1,20 @@
+
 /*
   TODO:
   - [x] Load/save config, permanent by user
   - [ ] Keep permanent register of active alerts
  */
+
+const colors = [
+    'yellow',
+    'red',
+    'green',
+    'blue',
+    'blueviolet',
+    'coral',
+    'darkorange'
+];
+
 
 document.querySelector('html').setAttribute('data-theme', 'dark');
 
@@ -22,38 +34,49 @@ const config = {
             error: ''
         },
         header: {
-            title: document.head.querySelector('title').innerText
+            title: document.head.querySelector('title').innerText,
+            version: ''
         },
         main: {
             token: syslib.get_cookie('token'),
             loading: true,
             user: '',
             map_visible: false,
-            alerts: []
+            alerts: [],
+            first_time: true,
+            search: ''
         },
         options: {
             visible: false,
             channels: [],
             subs: [],
-            colors: [
-                'yellow',
-                'red',
-                'green',
-                'blue',
-                'blueviolet',
-                'coral',
-                'darkorange'
-            ]
+            colors: {}
+        },
+        messages: {
+            show: false,
+            text: '',
+            color: 'green'
+        },
+        context_menu: {
+            menu: [],
+            visible: false,
+            y: 0,
+            x: 0
         }
     }
 };
 
 window.addEventListener('cordready', e => {
     $CORD.init(config);
+    setInterval(syslib.check_session.bind(syslib), 30000);
 });
 
 window.addEventListener('cordwebsocketready', e => {
     syslib.check_session();
-    setInterval(syslib.check_session.bind(syslib), 30000);
+    
+    document.body.querySelector('main').addEventListener('click', e => {
+        $CORD.$.options.$visible = false;
+        $CORD.$.context_menu.$visible = false;
+    });
 });
 

@@ -9,6 +9,7 @@ defmodule CORD.Application do
 
   @impl true
   def start(_type, _args) do
+    Logger.configure(level: Application.get_env(:logger, :level))
 
     children = [
       # The HTTP Server
@@ -38,7 +39,7 @@ defmodule CORD.Application do
 
     opts = [strategy: :one_for_one, name: CORD.Supervisor]
     
-    Logger.log(:info, "[CORD] Starting CORD services...")
+    Logger.log(:notice, "[CORD] Starting CORD services...")
     Supervisor.start_link(children, opts)
   end
 

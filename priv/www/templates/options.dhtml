@@ -20,7 +20,7 @@
             name="favcolor"
             onchange="syslib.refresh_color('${ch}', this.value);
                       syslib.save_config();"
-            value="${colors[ch_i]}"> 
+            value="${colors[ch]}"> 
         </label>
         :endforeach
       </fieldset>

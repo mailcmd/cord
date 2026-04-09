@@ -1,25 +1,23 @@
 <cord-load-templates>
+  @templates/main.dhtml
   @templates/header.dhtml
   @templates/options.dhtml
+  @templates/context-menu.dhtml
   @templates/login.dhtml
   @templates/loading.dhtml
+  @templates/messages.dhtml
 </cord-load-templates>
 
+<!-- page -->
 <cord-container cord-id="header" cord-tpl-ref="tpl-header"></cord-container>
+<cord-container cord-id="main" cord-tpl-ref="tpl-main"></cord-container>
+<footer>Ⓒ Vianet SRL</footer>
 
-<main cord-id="main">
-  <div id="box-board" class="main-container">
-    :foreach box in alerts :do
-    <div class="alert-box" style="background-color: ${box.color};">
-      ${box.name}
-    </div>
-    :endforeach
-  </div>
-  <div id="map-board" class="main-container h-100" :visible="${map_visible}"></div>
-</main>
+<!-- components -->
 
 <cord-container cord-id="login" cord-tpl-ref="tpl-login"></cord-container>
 <cord-container cord-id="loading" cord-tpl-ref="tpl-loading"></cord-container>
 <cord-container cord-id="options" cord-tpl-ref="tpl-options"></cord-container>
+<cord-container cord-id="messages" cord-tpl-ref="tpl-messages"></cord-container>
+<cord-container cord-id="context_menu" cord-tpl-ref="tpl-context-menu"></cord-container>
 
-<footer></footer>

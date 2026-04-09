@@ -4,7 +4,7 @@ defmodule CORD.Websocket do
   require Logger
   
   def init(conn, opts) do
-    Logger.log(:info, "[CORD][Websocket] Connection open")
+    Logger.log(:notice, "[CORD][Websocket] Connection open")
 
     websocket_manager = Keyword.fetch!(opts, :websocket_manager)
     websocket_manager.process_connection(conn, :open)
@@ -30,8 +30,8 @@ defmodule CORD.Websocket do
     {:ok, state}
   end
 
-  def terminate(_reason, _conn, %{websocket_manager: websocket_manager, conn: conn}) do
-    Logger.log(:info, "[CORD][Websocket] Connection closed")
+  def terminate(_reason, %{websocket_manager: websocket_manager, conn: conn}) do
+    Logger.log(:notice, "[CORD][Websocket] Connection closed")
     websocket_manager.process_connection(conn, :closed)
     :ok
   end

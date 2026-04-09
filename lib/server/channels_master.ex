@@ -69,7 +69,7 @@ defmodule CORD.ChannelsMaster do
   @impl true
   def init(channel) when not is_list(channel), do: init([channel])
   def init(channels) do
-    Logger.log(:info, "[ChannelsMaster] Initializing channels DB...")
+    Logger.log(:notice, "[ChannelsMaster] Initializing channels DB...")
     case :dets.open_file(:channels_master, [type: :set, file: ~c"priv/channels.dets"]) do
       {:error, reason} ->
         Logger.log(:error, "[ChannelsMaster] Problems with channels DB (#{inspect reason})")
@@ -95,7 +95,7 @@ defmodule CORD.ChannelsMaster do
     :dets.insert(table, {:available_channels, MapSet.new(new_channels_list)})
 	  :dets.sync(table)
 
-    Logger.log(:info, "[ChannelsMaster] Channel '#{channel}' added!")
+    Logger.log(:notice, "[ChannelsMaster] Channel '#{channel}' added!")
     push_broadcast_event(%{action: :add_channel, target: channel}, table)
 
     {:reply, Enum.uniq(new_channels_list), table}
@@ -112,7 +112,7 @@ defmodule CORD.ChannelsMaster do
 	  :dets.sync(table)
     
     push_broadcast_event(%{action: :remove_channel, target: channel}, table)
-    Logger.log(:info, "[ChannelsMaster] Channel '#{channel}' removed!")
+    Logger.log(:notice, "[ChannelsMaster] Channel '#{channel}' removed!")
 
     {:reply, new_channels_list, table}
   end
@@ -131,7 +131,7 @@ defmodule CORD.ChannelsMaster do
       Enum.map(channels, fn ch ->
         with {1, true} <- {1, Enum.member?(current_channels, ch)},
              {2, :ok} <- {2, :dets.insert(table, {{:subscription, ch, client_id}})} do
-          Logger.log(:info, "[ChannelsMaster] Client '#{client_id}' subscribed to '#{ch}'")
+          Logger.log(:notice, "[ChannelsMaster] Client '#{client_id}' subscribed to '#{ch}'")
           :ok
         else
           {1, _} -> 
@@ -149,7 +149,7 @@ defmodule CORD.ChannelsMaster do
   def handle_call({:unsubscribe, client_id, channels}, _from, table) do
     Enum.each(channels, fn ch ->     
       :dets.delete_object(table, {{:subscription, ch, client_id}})
-      Logger.log(:info, "[ChannelsMaster] Client '#{client_id}' unsubscribed of '#{ch}'")
+      Logger.log(:notice, "[ChannelsMaster] Client '#{client_id}' unsubscribed of '#{ch}'")
     end)
 	  :dets.sync(table)
     {:reply, :ok, table}
@@ -169,7 +169,7 @@ defmodule CORD.ChannelsMaster do
     new_event = {{:event_queue, System.os_time(:second)}, channel, event}
     :dets.insert(table, new_event)
 	  :dets.sync(table)
-    Logger.log(:info, "[ChannelsMaster] pushed event '#{inspect event}' to channel '#{channel}'")
+    Logger.log(:notice, "[ChannelsMaster] pushed event '#{inspect event}' to channel '#{channel}'")
     {:reply, new_event, table}
   end
   
@@ -177,7 +177,7 @@ defmodule CORD.ChannelsMaster do
     events = :dets.match(table, {{:event_queue, :"$1"}, channel, :"$2"})
     :dets.match_delete(table, {{:event_queue, :"$1"}, channel, :"$2"})
 	  :dets.sync(table)
-    Logger.log(:info, "[ChannelsMaster] poped events from channel '#{channel}'")
+    Logger.log(:notice, "[ChannelsMaster] poped events from channel '#{channel}'")
     {:reply, events, table}
   end
   
