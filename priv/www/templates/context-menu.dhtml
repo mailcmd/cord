@@ -1,9 +1,0 @@
-<cord-template cord-tpl-id="tpl-context-menu">
-  :if visible :do
-    <ul id="context-menu" style="top: ${y}px; left: ${x}px;">
-    :foreach item in menu :do
-      <li onclick="${item.onclick}">${item.text}</li>
-    :endforeach
-    </ul>
-  :endif
-</cord-template>

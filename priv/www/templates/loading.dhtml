@@ -1,7 +1,0 @@
-<cord-template cord-tpl-id="tpl-loading">
-  :if #{main:loading} :do
-  <dialog open>
-    <h1 aria-busy="true">${message}</h1>
-  </dialog>
-  :endif
-</cord-template>
