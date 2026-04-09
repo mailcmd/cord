@@ -97,30 +97,20 @@ alias CORD.ChannelsMaster
   ###################################################################################
 
   post "/push/channel:" <> channel do
+    Logger.log(:notice, "[CORD][API] Push request from API - Event to channel '#{channel}'")
     check_authorize_user(conn)
+    {json, conn} = check_json_body(conn)
 
-    # if not authorized the request do not reach the code below
-    {:ok, body, conn} = read_body(conn)
-    
-    with {:ok, json} <- JSON.decode(body),
-         event <- string_key_to_atom(json) do
-      
-      channel |> String.to_atom() |> ChannelsMaster.push_event(event)
-
-      conn
-      |> put_resp_content_type("application/json")      
-      |> send_resp(200, "{\"result_ok\": true}\n")
-    else
-      _ ->
-        conn
-        |> send_resp(400, "Malformed json request!\n")
-    end    
+    # if conn do not pass the checks, the request never reach the code below
+    Logger.log(:notice, "[CORD][API] Pushing event to channel '#{channel}'")
+    event = string_keys_to_atom(json) 
+    channel |> String.to_atom() |> ChannelsMaster.push_event(event)
+    conn
+    |> put_resp_content_type("application/json")      
+    |> send_resp(200, "{\"result_ok\": true}\n")
   end
   
-  post "/list/channels" do
-    check_authorize_user(conn)
-
-    # if not authorized the request do not reach the code below
+  get "/list/channels" do
     conn 
     |> put_resp_content_type("application/json")
     |> send_resp(200, JSON.encode!(ChannelsMaster.list_channels()))
@@ -135,25 +125,39 @@ alias CORD.ChannelsMaster
       conn.req_headers
       |> Enum.into(%{})
       |> Map.get("authorization")
-
     user_pass = @config[:api_user_pass]
 
     with {1, "Basic " <> b64} <- {1, auth},
          {2, ^user_pass} <- {2, Base.decode64!(b64)} do
-      conn
-      
+      conn      
     else      
       {1, _} ->
         conn 
         |> send_resp(401, "Error: No authorization sent!\n")
-
       _ ->
         conn 
         |> send_resp(403, "Error: bad user/pass!\n")
     end        
   end
 
-  defp string_key_to_atom(map) do
+  defp check_json_body(conn) do
+    {:ok, body, conn} = read_body(conn)
+    body =
+      case body do
+        "q=" <> _ -> body |> URI.decode_query(%{}, :www_form) |> Map.get("q")
+        _ -> body
+      end 
+    
+    case JSON.decode(body) do
+      {:ok, json} ->
+        {json, conn} 
+      _ ->
+        conn
+        |> send_resp(400, "Malformed json request!\n")        
+    end
+  end
+  
+  defp string_keys_to_atom(map) do
     map |> Enum.map(fn {k,v} -> {String.to_atom(k), v} end) |> Enum.into(%{})
   end
   

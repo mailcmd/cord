@@ -7,7 +7,8 @@ defmodule FTTH.Collector do
   @node_delay Keyword.get(@collector_config, :node_delay, 500)
   @node_up_thresold Keyword.get(@collector_config, :node_up_thresold, 0)
   @threads Keyword.get(@collector_config, :threads, 8)
-
+  @exclude_nodes Keyword.get(@collector_config, :exclude_nodes, "-9999999")
+  
   require Logger
   import Collector.Helpers
   alias FTTH.Storage
@@ -28,6 +29,9 @@ defmodule FTTH.Collector do
   end
 
   def collector() do
+    Logger.log(:notice, "[Collector]:[FTTH] Starting collector...")
+    start_ts = System.os_time()
+    
     conn = PgSQL.Conn.get()
     nodes = PgSQL.query(conn, """
       WITH RECURSIVE tree AS (
@@ -60,7 +64,7 @@ defmodule FTTH.Collector do
         FROM
           tree
         WHERE
-          id > 2 AND id != 64198 AND id_onu is not null
+          id > 2 AND id not in (#{@exclude_nodes}) AND id_onu is not null
         GROUP BY
           id_padre, id
         ORDER BY
@@ -79,7 +83,9 @@ defmodule FTTH.Collector do
    Storage.set({tree, roots})
 
    collect_nodes()
-
+    Logger.log(:notice,
+               "[Collector]:[FTTH] Finishing collector, " <>
+               "colletion took #{div(System.os_time() - start_ts, 1000000000)} secs")
     # next round
    :timer.sleep(@node_delay)
    collector()

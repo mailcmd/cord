@@ -166,7 +166,7 @@ defmodule CORD.ChannelsMaster do
   end
 
   def handle_call({:push_event, channel, event}, _from, table) do
-    new_event = {{:event_queue, System.os_time(:second)}, channel, event}
+    new_event = {{:event_queue, System.os_time()}, channel, event}
     :dets.insert(table, new_event)
 	  :dets.sync(table)
     Logger.log(:notice, "[ChannelsMaster] pushed event '#{inspect event}' to channel '#{channel}'")

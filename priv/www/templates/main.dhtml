@@ -5,7 +5,7 @@
 
         <div class="alert-box" title="${box.ts}" alert-box-id="${box.id}"
              style="background-color: ${$.options.colors[box.channel]};"
-             onclick="syslib.alert_box_action(event, '${box.id}')"
+             onclick="applib.alert_box_action(event, '${box.id}')"
         >${box.description}</div>
 
       :endforeach

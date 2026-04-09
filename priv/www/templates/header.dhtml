@@ -28,7 +28,7 @@
         <li>
           <button
             class="primary"
-            onclick="syslib.logout()">
+            onclick="applib.logout()">
             <i class="icon icon-logout font-120"></i>
           </button>
         </li>

@@ -1,7 +1,3 @@
-const markers = {};
-var map;
-
-
 function Syslib() {
     const $this = this;
     /////////////////////////////////////////////////////////////////////////////////
@@ -73,16 +69,6 @@ function Syslib() {
         }
     }
 
-    const send = function(action, data, callback = console.log) {
-        $CORD.ws.send(
-            {
-                ...{msg_id: random_id(), action: action, token: $CORD.get("main:token")},
-                ...data
-            },
-            callback
-        );
-    };
-
     const notify = {
         log: function() {
             console.log(...arguments),
@@ -107,108 +93,6 @@ function Syslib() {
         setTimeout(()=>$CORD.set('messages:show', false), timeout);
     };
 
-    // login ok
-    const init_session = function(user, msg) {
-        if ($CORD.$.main.token != msg.token || $CORD.$.main.user != msg.user) {
-            $CORD.update('main', {
-                token: msg.token,
-                user: msg.user
-            });
-            // cookies
-            set_cookie('token', msg.token);
-            set_cookie('user', user);
-        }
-
-        // load config if it is first time
-        if ($CORD.$.main.first_time) $this.load_config();
-
-        if (!$CORD.$.options.channels.is_equal(msg.channels)
-            || !$CORD.$.options.subs.is_equal(msg.subs)) {
-            $CORD.update('options', {
-                channels: msg.channels,
-                colors: msg.channels.reduce( (o, c, i) => (o[c] = colors[i],o), {}),
-                subs: msg.subs
-            });
-        }
-
-        // init map
-        if (!map) $this.map_load(msg.lat, msg.lng);
-        $CORD.$.main.first_time = false;
-    };
-
-    /////////////////////////////////////////////////////////////////////////////////
-    // Default message receiver
-    /////////////////////////////////////////////////////////////////////////////////
-    const attend_broadcast = function(msg) {
-        switch (msg.action) {
-        case 'add_channel':
-            $CORD.update_object(
-                'options',
-                'channels',
-                {action: 'push', datas: [msg.target]}
-            );
-            break;
-        case 'remove_channel':
-            const channels = $CORD.get('options:channels');
-            const i = channels.indexOf(msg.target);
-            $CORD.update_object(
-                'options',
-                'channels',
-                {action: 'remove', datas: [i]}
-            );
-            break;
-        }
-    };
-
-    const attend_events = function(msg) {
-        let i;
-        switch (msg.action) {
-        case 'add_alert':
-            $CORD.update_object('main', 'alerts', {
-                action: 'push',
-                datas: [{
-                    channel: msg.channel,
-                    ts: Temporal.Instant.fromEpochMilliseconds(msg.ts*1000).toLocaleString(),
-                    ...msg.alert,
-                    color: $CORD.$.options.colors[msg.channel]
-                }]
-            });
-            if (msg.alert.lat) {
-                $this.map_add_circle(
-                    msg.alert.id,
-                    msg.alert.lat,
-                    msg.alert.lng,
-                    msg.alert.rad,
-                    msg.alert.description,
-                    $CORD.$.options.colors[msg.channel]
-                );
-            }
-            break;
-
-        case 'remove_alert':
-            i = $CORD.$.main.alerts.findIndex(a => a.id == msg.alert.id);
-            $CORD.update_object('main', 'alerts', {
-                action: 'remove',
-                datas: [i]
-            });
-            $this.map_remove_circle(msg.alert.id);
-            break;
-        }
-    };
-
-    this.onmessage = function(msg) {
-        console.log('SYSLIB_ONMESSAGE', msg)
-        switch (msg.channel) {
-        case 'broadcast':
-            attend_broadcast(msg);
-            break;
-
-        default:
-            attend_events(msg);
-            break;
-        }
-    };
-
     /////////////////////////////////////////////////////////////////////////////////
     // Public API
     /////////////////////////////////////////////////////////////////////////////////
@@ -218,252 +102,13 @@ function Syslib() {
     this.get_cookie = get_cookie;
     this.delete_cookie = delete_cookie;
     this.notify = notify;
+    this.random_id = random_id;
 
     this.clipboard_copy = function(el) {
         clipboard_select_el(el);
         clipboard_copy_selection();
         clipboard_clear_selection();
         notify.log('Copied to clipboard!');
-    };
-
-    this.alert_box_action = function(ev, id) {
-        ev.stopPropagation();
-        $CORD.update('context_menu', {
-            menu: [
-                {
-                    text: "⊟ Copy to clipboard",
-                    onclick:
-                    `syslib.alert_box_copy('${id}');$CORD.set('context_menu:visible', false)`
-                },
-                {
-                    text: "⊝ Remove alert",
-                    onclick:
-                    `syslib.alert_box_remove('${id}');$CORD.set('context_menu:visible', false)`
-                }
-            ],
-            visible: true,
-            y: ev.pageY,
-            x: ev.pageX
-        });
-    };
-
-    this.alert_box_copy = function(id) {
-        syslib.clipboard_copy(document.querySelector('[alert-box-id="'+id+'"]'));
-    };
-    
-    this.alert_box_remove = function(id) {
-        send('remove_alert', {id: id}, msg => {
-            const i = $CORD.$.main.alerts.findIndex( a=> a.id == id);
-            $CORD.update_object('main', 'alerts', {action: 'remove', datas: [i]});
-        });
-    };
-
-    this.save_config = function() {
-        const config = {
-            options: {
-                colors: $CORD.$.options.colors
-            }
-        };
-        send('save_config', {user: $CORD.$.main.user, config: config}, msg => {
-            if (msg.result_ok) {
-                notify.log("Config saved ok!")
-            } else {
-                notify.error("Config save failed!")
-            }
-        });
-    };
-
-    this.load_config = function() {
-        send('load_config', {user: $CORD.$.main.user}, msg => {
-            console.log('LOAD_CONFIG', msg);
-            
-            if (msg.version) $CORD.$.header.$version = msg.version;
-            
-            // this first for paint alerts with saved colors (not default colors)
-            if (msg.config?.options?.colors) {
-                $CORD.$.options.colors = msg.config.options.colors;
-            }
-            
-            // SORRY: I do not like this...            
-            for (let a of (msg.config?.main?.alerts||[])) {
-                a.ts = Temporal.Instant.fromEpochMilliseconds(a.ts*1000).toLocaleString();
-            }
-
-            // Set containers updates
-            for (let cord_id in msg.config) {
-                $CORD.update(cord_id, msg.config[cord_id]);
-            }
-
-            // Draw alerts on map if required
-            for (let a of $CORD.$.main.alerts) {
-                if (a.lat) {
-                    $this.map_add_circle(
-                        a.id,
-                        a.lat,
-                        a.lng,
-                        a.rad,
-                        a.description,
-                        $CORD.$.options.colors[a.channel]
-                    );
-                }
-            }
-        });
-    };
-
-    this.refresh_color = function(channel, value) {
-        $CORD.$.options.colors[channel] = value;
-        for (let a of $CORD.$.main.alerts) {
-            if (a.lat) {
-                $this.map_add_circle(
-                    a.id,
-                    a.lat,
-                    a.lng,
-                    a.rad,
-                    a.description,
-                    value
-                );
-            }
-        }
-        $CORD.refresh('main');
-    };
-
-    this.show_loading = function(text = 'Loading...') {
-        $CORD.set('loading:message', text);
-        $CORD.set('main:loading', true);
-    };
-
-    this.hide_loading = function() {
-        $CORD.set('main:loading', false);
-    };
-
-    this.authorize_user = function(user, pass) {
-        $CORD.set("login:error", "")
-        this.show_loading('Authorizing user...');
-
-        send(
-            'authorize',
-            {user: user, pass: pass},
-            msg => {
-                console.log('AUTH', msg)
-                this.hide_loading();
-                if (msg.token) {
-                    // login ok
-                    init_session(user, msg);
-                } else {
-                    // login fail
-                    $CORD.set("login:error", "Incorrect user or password!")
-                }
-            }
-        );
-    };
-
-    this.logout = function() {
-        $CORD.set('main:token', null);
-        $CORD.set("main:user", '')
-        delete_cookie('token');
-        delete_cookie('user');
-    };
-
-    this.check_session = function() {
-        // console.log('CHECK_SESSION')
-        const token = get_cookie('token');
-        if (token === null) {
-            this.hide_loading();
-            return;
-        }
-        // this.show_loading('Checking session opened...');
-
-        send(
-            'check_session',
-            {token: token},
-            msg => {
-                if (!msg.token) {
-                    // This block is never reached
-                    // (cord-update message is intercepted)
-                    $CORD.set('main:token', null);
-                    $CORD.set("login:error", "Session exired!")
-                } else {
-                    // session open
-                    init_session(get_cookie('user'), msg);
-                }
-                this.hide_loading();
-            }
-        );
-    };
-
-    this.subscription = function(channel, status) {
-        if (status) {
-            this.subscribe(channel);
-        } else {
-            this.unsubscribe(channel);
-        }
-    };
-
-    this.subscribe = function(channel) {
-        send(
-            'subscribe',
-            {channel: channel},
-            msg => {
-                if (!msg.result_ok) {
-                    notify.warn(`Subscription to channel '${channel}' failed!`);
-                } else {
-                    $CORD.set('options:subs', msg.subs)
-                    notify.log(`Subscription to channel '${channel}' ok!`);
-                }
-            }
-        );
-    };
-
-    this.unsubscribe = function(channel) {
-        send(
-            'unsubscribe',
-            {channel: channel},
-            msg => {
-                if (!msg.result_ok) {
-                    notify.warn(`Unsubscription from channel '${channel}' failed!`);
-                } else {
-                    $CORD.set('options:subs', msg.subs)
-                    notify.log(`Unsubscription from channel '${channel}' ok!`);
-                }
-            }
-        );
-    };
-
-    this.renew_token = function() {
-        send(
-            'renew_token',
-            {},
-            msg => {
-                if (!msg.token) {
-                    notify.warn(`Renew token failed!`);
-                } else {
-                    set_cookie('token', msg.token);
-                    notify.log('New token assigned:', msg.token);
-                }
-            }
-        );
-    };
-
-    this.get_channels = function(callback = console.log) {
-        send(
-            'get_channels',
-            {},
-            callback
-        );
-    };
-
-    this.map_load = function(lat, lng) {
-        map = L.map('map-board').setView([lat, lng], 12);
-        L.tileLayer(
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-            {
-                maxZoom: 18,
-                attribution: '&copy; OpenStreetMap',
-                zoomControl: false,
-                ext: 'png'
-            }
-        ).addTo(map);
-        map.zoomControl.remove();
     };
 
     this.map_clear_circles = function() {
@@ -487,6 +132,19 @@ function Syslib() {
         markers[id] && markers[id].remove()
     };
 
+    this.map_load = function(lat, lng) {
+        map = L.map('map-board').setView([lat, lng], 12);
+        L.tileLayer(
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+            {
+                maxZoom: 18,
+                attribution: '&copy; OpenStreetMap',
+                zoomControl: false,
+                ext: 'png'
+            }
+        ).addTo(map);
+        map.zoomControl.remove();
+    };
 }
 
 const syslib = new Syslib();

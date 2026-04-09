@@ -9,7 +9,7 @@ function Applib() {
     const send = function(action, data, callback = console.log) {
         $CORD.ws.send(
             {
-                ...{msg_id: random_id(), action: action, token: $CORD.get("main:token")},
+                ...{msg_id: syslib.random_id(), action: action, token: $CORD.get("main:token")},
                 ...data
             },
             callback
@@ -24,8 +24,8 @@ function Applib() {
                 user: msg.user
             });
             // cookies
-            set_cookie('token', msg.token);
-            set_cookie('user', user);
+            syslib.set_cookie('token', msg.token);
+            syslib.set_cookie('user', user);
         }
 
         // load config if it is first time
@@ -41,7 +41,7 @@ function Applib() {
         }
 
         // init map
-        if (!map) $this.map_load(msg.lat, msg.lng);
+        if (!map) syslib.map_load(msg.lat, msg.lng);
         $CORD.$.main.first_time = false;
     };
 
@@ -83,7 +83,7 @@ function Applib() {
                 }]
             });
             if (msg.alert.lat) {
-                $this.map_add_circle(
+                syslib.map_add_circle(
                     msg.alert.id,
                     msg.alert.lat,
                     msg.alert.lng,
@@ -100,7 +100,7 @@ function Applib() {
                 action: 'remove',
                 datas: [i]
             });
-            $this.map_remove_circle(msg.alert.id);
+            syslib.map_remove_circle(msg.alert.id);
             break;
         }
     };
@@ -129,12 +129,12 @@ function Applib() {
                 {
                     text: "⊟ Copy to clipboard",
                     onclick:
-                    `syslib.alert_box_copy('${id}');$CORD.set('context_menu:visible', false)`
+                    `applib.alert_box_copy('${id}');$CORD.set('context_menu:visible', false)`
                 },
                 {
                     text: "⊝ Remove alert",
                     onclick:
-                    `syslib.alert_box_remove('${id}');$CORD.set('context_menu:visible', false)`
+                    `applib.alert_box_remove('${id}');$CORD.set('context_menu:visible', false)`
                 }
             ],
             visible: true,
@@ -151,6 +151,7 @@ function Applib() {
         send('remove_alert', {id: id}, msg => {
             const i = $CORD.$.main.alerts.findIndex( a=> a.id == id);
             $CORD.update_object('main', 'alerts', {action: 'remove', datas: [i]});
+            syslib.map_remove_circle(id);
         });
     };
 
@@ -162,9 +163,9 @@ function Applib() {
         };
         send('save_config', {user: $CORD.$.main.user, config: config}, msg => {
             if (msg.result_ok) {
-                notify.log("Config saved ok!")
+                syslib.notify.log("Config saved ok!")
             } else {
-                notify.error("Config save failed!")
+                syslib.notify.error("Config save failed!")
             }
         });
     };
@@ -193,7 +194,7 @@ function Applib() {
             // Draw alerts on map if required
             for (let a of $CORD.$.main.alerts) {
                 if (a.lat) {
-                    $this.map_add_circle(
+                    syslib.map_add_circle(
                         a.id,
                         a.lat,
                         a.lng,
@@ -209,8 +210,8 @@ function Applib() {
     this.refresh_color = function(channel, value) {
         $CORD.$.options.colors[channel] = value;
         for (let a of $CORD.$.main.alerts) {
-            if (a.lat) {
-                $this.map_add_circle(
+            if (a.lat && a.channel == channel) {
+                syslib.map_add_circle(
                     a.id,
                     a.lat,
                     a.lng,
@@ -256,13 +257,13 @@ function Applib() {
     this.logout = function() {
         $CORD.set('main:token', null);
         $CORD.set("main:user", '')
-        delete_cookie('token');
-        delete_cookie('user');
+        syslib.delete_cookie('token');
+        syslib.delete_cookie('user');
     };
 
     this.check_session = function() {
         // console.log('CHECK_SESSION')
-        const token = get_cookie('token');
+        const token = syslib.get_cookie('token');
         if (token === null) {
             this.hide_loading();
             return;
@@ -280,7 +281,7 @@ function Applib() {
                     $CORD.set("login:error", "Session exired!")
                 } else {
                     // session open
-                    init_session(get_cookie('user'), msg);
+                    init_session(syslib.get_cookie('user'), msg);
                 }
                 this.hide_loading();
             }
@@ -301,10 +302,10 @@ function Applib() {
             {channel: channel},
             msg => {
                 if (!msg.result_ok) {
-                    notify.warn(`Subscription to channel '${channel}' failed!`);
+                    syslib.notify.warn(`Subscription to channel '${channel}' failed!`);
                 } else {
                     $CORD.set('options:subs', msg.subs)
-                    notify.log(`Subscription to channel '${channel}' ok!`);
+                    syslib.notify.log(`Subscription to channel '${channel}' ok!`);
                 }
             }
         );
@@ -316,10 +317,10 @@ function Applib() {
             {channel: channel},
             msg => {
                 if (!msg.result_ok) {
-                    notify.warn(`Unsubscription from channel '${channel}' failed!`);
+                    syslib.notify.warn(`Unsubscription from channel '${channel}' failed!`);
                 } else {
                     $CORD.set('options:subs', msg.subs)
-                    notify.log(`Unsubscription from channel '${channel}' ok!`);
+                    syslib.notify.log(`Unsubscription from channel '${channel}' ok!`);
                 }
             }
         );
@@ -331,10 +332,10 @@ function Applib() {
             {},
             msg => {
                 if (!msg.token) {
-                    notify.warn(`Renew token failed!`);
+                    syslib.notify.warn(`Renew token failed!`);
                 } else {
-                    set_cookie('token', msg.token);
-                    notify.log('New token assigned:', msg.token);
+                    syslib.set_cookie('token', msg.token);
+                    syslib.notify.log('New token assigned:', msg.token);
                 }
             }
         );
@@ -348,19 +349,6 @@ function Applib() {
         );
     };
 
-    this.map_load = function(lat, lng) {
-        map = L.map('map-board').setView([lat, lng], 12);
-        L.tileLayer(
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-            {
-                maxZoom: 18,
-                attribution: '&copy; OpenStreetMap',
-                zoomControl: false,
-                ext: 'png'
-            }
-        ).addTo(map);
-        map.zoomControl.remove();
-    };
 }
 
 const applib = new Applib();

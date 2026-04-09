@@ -31,7 +31,7 @@ defmodule MessagesManager do
     event =
       event_data
       |> put_in([:channel], channel)
-      |> put_in([:ts], ts)
+      |> put_in([:ts], div(ts, 1000000000))
 
     send_event(pids, event)
     :timer.sleep(1500)

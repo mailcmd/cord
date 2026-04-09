@@ -23,7 +23,7 @@ const config = {
     strict: true,
     websocket: {
         url: 'ws://localhost:8080/websocket',
-        onmessage: syslib.onmessage,
+        onmessage: applib.onmessage,
         reconnect_delay: 3000
     },
     containers: {
@@ -68,11 +68,11 @@ const config = {
 
 window.addEventListener('cordready', e => {
     $CORD.init(config);
-    setInterval(syslib.check_session.bind(syslib), 30000);
+    setInterval(applib.check_session.bind(applib), 30000);
 });
 
 window.addEventListener('cordwebsocketready', e => {
-    syslib.check_session();
+    applib.check_session();
     
     document.body.querySelector('main').addEventListener('click', e => {
         $CORD.$.options.$visible = false;

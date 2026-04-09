@@ -11,15 +11,15 @@
           <input
             name="${ch}"
             type="checkbox"
-            onchange="syslib.subscription('${ch}', this.checked);syslib.save_config()"
+            onchange="applib.subscription('${ch}', this.checked);applib.save_config()"
             role="switch" :checked=${subs.includes(ch)} />
           Channel <strong>${ch}</strong>
           <input
             type="color"
             class="float-right pointer"
             name="favcolor"
-            onchange="syslib.refresh_color('${ch}', this.value);
-                      syslib.save_config();"
+            onchange="applib.refresh_color('${ch}', this.value);
+                      applib.save_config();"
             value="${colors[ch]}"> 
         </label>
         :endforeach
