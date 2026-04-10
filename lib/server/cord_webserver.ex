@@ -1,8 +1,9 @@
 defmodule CORD.Webserver do
   @moduledoc """
   """
-alias CORD.ChannelsMaster
-
+  alias CORD.ChannelsMaster
+  import CORD.Utils
+  
   use CORD.HTTPServer
 
   @config Application.compile_env!(:cord, :local_config)
@@ -155,10 +156,6 @@ alias CORD.ChannelsMaster
         conn
         |> send_resp(400, "Malformed json request!\n")        
     end
-  end
-  
-  defp string_keys_to_atom(map) do
-    map |> Enum.map(fn {k,v} -> {String.to_atom(k), v} end) |> Enum.into(%{})
   end
   
 end

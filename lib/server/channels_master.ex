@@ -2,7 +2,7 @@ defmodule CORD.ChannelsMaster do
   @moduledoc """
   table records:
     - {:available_channels, MapSet()}                            # uniq
-    - {{:subscription, channel}, client_id}                        # multiple
+    - {{:subscription, channel, client_id}}                        # multiple
       ...
     - {{:event_queue, timestamp}, {channel, event_description}}    # multiple
       ...
