@@ -49,8 +49,17 @@ defmodule CORD.Webserver do
   end
 
   get "/favicon.ico" do
-    icon = "data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII="
-
+    icon = 
+      case Keyword.get(@config, :favicon) do
+        nil ->  
+          "data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T" <>
+            "///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lE" <>
+            "QVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII="        
+        file_name ->
+          Application.get_env(:cord, :http)[:root_dir]
+          |> Kernel.<>("/#{file_name}")
+          |> File.read!()
+      end
     conn
     |> put_resp_content_type("image/x-icon")
     |> send_resp(200, icon)

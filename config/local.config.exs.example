@@ -1,12 +1,13 @@
 import Config
 
 config :cord, :local_config, 
-    websocket_manager: MessagesManager,
-    app_supervisor: SPIDownDetector,
+    websocket_manager: <module>,
+    app_supervisor: <module>,
     events_pop_interval: 5_000,
-    api_user_pass: "vianet:lowland", # user:pass
+    api_user_pass: "", # user:pass
     title: "SPI Down Detector",
     main_file: "main.html",
+    favicon: "imgs/iso.ico",
     css_files: [
       "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
       "css/pico.css",
