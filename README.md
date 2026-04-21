@@ -23,6 +23,7 @@ $ mix deps.get
 $ git clone https://github.com/mailcmd/cord-js.git
 $ cp cord-js/cord.js lib/layout/js/
 $ rm -rf cord-js
+$ mkdir -p priv/www
 
 ## PUT YOUR CORD WEB SITE IN /priv/www 
 ## EDIT config/local/config.exs 
