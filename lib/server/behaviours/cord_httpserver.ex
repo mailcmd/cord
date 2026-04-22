@@ -16,7 +16,14 @@ defmodule CORD.HTTPServer do
     quote do
       # Default response for non legal calls
       def call(conn, _opts) do
-        Logger.log(:warning, "[CORD][HTTP] 404 - Try to get #{conn.request_path}")
+        with list <- String.split(conn.request_path, "/"),             
+             [_, module, fun] <- Enum.map(&Strint.to_atom),
+             true <- function_exported?(module, fun, 1) do
+          Logger.log(:info, "[CORD][HTTP] Calling external function #{module}.#{fun}")
+        else
+          _ -> 
+            Logger.log(:warning, "[CORD][HTTP] 404 - Try to get #{conn.request_path}")
+        end
         conn
         |> put_resp_content_type("text/plain")
         |> send_resp(404, "404 Not Found!\n")
