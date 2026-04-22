@@ -29,7 +29,6 @@ defmodule CORD.HTTPServer do
              [module, fun] <- [Module.concat(module), fun],
              true <- function_exported?(module, fun, 2) do
           
-          Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
           # TODO: Security control, module name starting with "<app_name>."
           try do
             extra_params =
@@ -41,6 +40,10 @@ defmodule CORD.HTTPServer do
                   [[_, type, value]] -> apply(String, String.to_atom("to_#{type}"), [value])
                 end
               end)
+            Logger.log(
+              :notice,
+              "[CORD][HTTP] Calling external function #{module}.#{fun}(#{inspect extra_params})"
+            )            
             module
             |> apply(fun, [conn, extra_params])
             |> build_resp()
