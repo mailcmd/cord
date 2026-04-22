@@ -18,7 +18,7 @@ defmodule CORD.Application do
         scheme: :http,
         plug: {CORD.Webserver, @config},
         options: [
-          port: Keyword.fetch!(@config, :port),
+          port: Keyword.get(@local_config, :port, Keyword.fetch!(@config, :port)),
           dispatch: dispatcher()
         ]
       },
