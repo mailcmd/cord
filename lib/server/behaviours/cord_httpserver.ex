@@ -35,13 +35,13 @@ defmodule CORD.HTTPServer do
               list
               |> :lists.sublist(4, 99)
               |> Enum.map(fn p ->
-                case Regex.scan(~r/(?:\((.+?)\)|)(.+)/, p) |> IO.inspect do
+                case Regex.scan(~r/(?:\((.+?)\)|)(.+)/, p) do
                   [[_, "", value]] -> value
                   [[_, type, value]] -> apply(String, String.to_atom("to_#{type}"), [value])
                 end
               end)
             module
-            |> apply(fun, [conn | extra_params] |> IO.inspect)
+            |> apply(fun, [conn | extra_params])
             |> build_resp()
           rescue
             e ->
