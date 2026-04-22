@@ -22,17 +22,17 @@ defmodule CORD.HTTPServer do
     quote do
       # Default response for non legal calls
       def call(conn, _opts) do
-        with list <- String.split(conn.request_path, "/") |> IO.inspect,
+        with list <- String.split(conn.request_path, "/"),
              [_, module, [fun] | _] <- Enum.map(list, fn s ->
                s |> String.split(".") |> Enum.map(&String.to_atom/1)
-             end) |> IO.inspect,
-             [module, fun] <- [Module.concat(module), fun] |> IO.inspect,
-             true <- function_exported?(module, fun, length(list)-2)  |> IO.inspect do
+             end),
+             [module, fun] <- [Module.concat(module), fun],
+             true <- function_exported?(module, fun, length(list)-2) do
           Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
           # TODO: Security control, module name starting with "SMI."
           try do
             module
-            |> apply(fun, [conn | :lists.sublist(list, 4, 99)])
+            |> apply(fun, [conn | :lists.sublist(list, 4, 99)] |> IO.inspect)
             |> build_resp()
           rescue
             e ->
