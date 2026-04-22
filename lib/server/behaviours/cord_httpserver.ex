@@ -19,7 +19,7 @@ defmodule CORD.HTTPServer do
         with list <- String.split(conn.request_path, "/"),             
              [_, module, fun] <- Enum.map(list, &String.to_atom/1),
              true <- function_exported?(Module.concat([module]), fun, 1) do
-          Logger.log(:info, "[CORD][HTTP] Calling external function #{module}.#{fun}")
+          Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
         else
           _ -> 
             Logger.log(:warning, "[CORD][HTTP] 404 - Try to get #{conn.request_path}")
