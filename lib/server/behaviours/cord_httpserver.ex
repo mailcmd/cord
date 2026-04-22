@@ -38,7 +38,7 @@ defmodule CORD.HTTPServer do
                 :error,
                 "[CORD][HTTP] Function #{module}.#{fun} does not return a connection struct"
               )
-              conn
+              send_resp(conn, 500, "Internal server error!\n")
           end
         else
           _ ->
