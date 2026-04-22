@@ -23,8 +23,9 @@ defmodule CORD.HTTPServer do
           Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
           # TODO: Security control, module name starting with "SMI."          
           try do
-            new_conn = %Plug.Conn{} = apply(module, fun, [conn])
-            new_conn
+            module
+            |> apply(fun, [conn])
+            |> send_resp(200, new_conn.assigns[:text] || "")
           rescue
             e ->
               Logger.log(
