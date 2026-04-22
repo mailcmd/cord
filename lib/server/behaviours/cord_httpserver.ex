@@ -27,7 +27,7 @@ defmodule CORD.HTTPServer do
                s |> String.split(".") |> Enum.map(&String.to_atom/1)
              end) |> IO.inspect,
              [module, fun] <- [Module.concat(module), fun] |> IO.inspect,
-             true <- function_exported?(module, fun, length(list)-3)  |> IO.inspect do
+             true <- function_exported?(module, fun, length(list)-2)  |> IO.inspect do
           Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
           # TODO: Security control, module name starting with "SMI."
           try do
