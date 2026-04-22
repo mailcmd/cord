@@ -21,15 +21,25 @@ defmodule CORD.HTTPServer do
              [module, fun] <- [Module.concat([module]), fun],
              true <- function_exported?(module, fun, 1) do
           Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
-          # TODO: Security control, module name starting with "SMI."
-          apply(module, fun, [conn])
+          # TODO: Security control, module name starting with "SMI."          
+          try do
+            new_conn = %Plug.Conn{} = apply(module, fun, [conn])
+            new_conn
+          rescue
+            e ->
+              Logger.log(
+                :error,
+                "[CORD][HTTP] Function #{module}.#{fun} does not return a connection struct"
+              )
+              conn
+          end
         else
           _ -> 
             Logger.log(:warning, "[CORD][HTTP] 404 - Try to get #{conn.request_path}")
+            conn
+            |> put_resp_content_type("text/plain")
+            |> send_resp(404, "404 Not Found!\n")
         end
-        conn
-        |> put_resp_content_type("text/plain")
-        |> send_resp(404, "404 Not Found!\n")
       end
     end
   end
