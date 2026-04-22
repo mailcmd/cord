@@ -35,7 +35,7 @@ defmodule CORD.HTTPServer do
               list
               |> :lists.sublist(4, 99)
               |> Enum.map(fn p ->
-                case Regex.scan(~r/(?:\((.+?)\)|)(.+)/, p) do
+                case Regex.scan(~r/(?:\((.+?)\)|)(.+)/, p) |> IO.inspect do
                   [[_, "", value]] -> value
                   [[_, type, value]] -> apply(String, String.to_atom("to_#{type}"), [value])
                 end
