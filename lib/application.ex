@@ -5,7 +5,7 @@ defmodule CORD.Application do
   require Logger
 
   @config Application.compile_env!(:cord, :http)
-  @local_config Application.compile_env!(:cord, :local_config)
+  @local_config Application.compile_env(:cord, :local_config, [])
 
   @impl true
   def start(_type, _args) do
@@ -29,16 +29,16 @@ defmodule CORD.Application do
         {
           Keyword.get(@local_config, :events_pop_interval),
           Keyword.get(@local_config, :websocket_manager)
-        }               
+        }
       },
       # Permanent Storage
-      {CORD.PermanentStorage, []},      
-      # User defined APP 
-      @local_config[:app_supervisor]
+      {CORD.PermanentStorage, []}
     ]
+    # User defined APP
+    ++ (@local_config[:app_supervisor] && [@local_config[:app_supervisor]] || [])
 
     opts = [strategy: :one_for_one, name: CORD.Supervisor]
-    
+
     Logger.log(:notice, "[CORD] Starting CORD services...")
     Supervisor.start_link(children, opts)
   end
@@ -56,5 +56,5 @@ defmodule CORD.Application do
        ]
       }
     ]
-  end  
+  end
 end

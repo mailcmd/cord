@@ -27,9 +27,10 @@ defmodule CORD.HTTPServer do
                s |> String.split(".") |> Enum.map(&String.to_atom/1)
              end),
              [module, fun] <- [Module.concat(module), fun],
-             true <- function_exported?(module, fun, length(list)-2) do
+             true <- function_exported?(module, fun, 2) do
+          
           Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
-          # TODO: Security control, module name starting with "SMI."
+          # TODO: Security control, module name starting with "<app_name>."
           try do
             extra_params =
               list
@@ -41,7 +42,7 @@ defmodule CORD.HTTPServer do
                 end
               end)
             module
-            |> apply(fun, [conn | extra_params])
+            |> apply(fun, [conn, extra_params])
             |> build_resp()
           rescue
             e ->
@@ -52,6 +53,7 @@ defmodule CORD.HTTPServer do
               )
               send_resp(conn, 500, "Internal server error!\n")
           end
+          
         else
           _ ->
             Logger.log(:warning, "[CORD][HTTP] 404 - Try to get #{conn.request_path}")

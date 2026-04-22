@@ -6,7 +6,7 @@ defmodule CORD.Webserver do
   
   use CORD.HTTPServer
 
-  @config Application.compile_env!(:cord, :local_config)
+  @config Application.compile_env(:cord, :local_config, [])
 
   ###################################################################################
   # Index HTML
