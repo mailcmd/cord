@@ -24,3 +24,4 @@ cord-*.tar
 
 /config/local/*
 
+/priv/*.dets
