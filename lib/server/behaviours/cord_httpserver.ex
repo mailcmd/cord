@@ -6,6 +6,9 @@ defmodule CORD.HTTPServer do
       require Logger
       
       def init(options), do: options
+      defp build_resp(conn) do
+        send_resp(conn, 200, conn.assigns[:text] || "")
+      end
 
       @before_compile unquote(__MODULE__)       
     end
@@ -25,7 +28,7 @@ defmodule CORD.HTTPServer do
           try do
             module
             |> apply(fun, [conn])
-            |> send_resp(200, new_conn.assigns[:text] || "")
+            |> build_resp()
           rescue
             e ->
               Logger.log(
