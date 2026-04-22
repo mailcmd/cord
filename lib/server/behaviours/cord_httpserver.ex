@@ -31,8 +31,17 @@ defmodule CORD.HTTPServer do
           Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
           # TODO: Security control, module name starting with "SMI."
           try do
+            extra_params =
+              list
+              |> :lists.sublist(4, 99)
+              |> Enum.map(fn p ->
+                case Regex.scan(~r/(?:\((.+?)\)|)(.+)/, p) do
+                  [[_, "", value]] -> value
+                  [[_, type, value]] -> apply(String, String.to_atom("to_#{type}"), [value])
+                end
+              end)
             module
-            |> apply(fun, [conn | :lists.sublist(list, 4, 99)] |> IO.inspect)
+            |> apply(fun, [conn | extra_params] |> IO.inspect)
             |> build_resp()
           rescue
             e ->
