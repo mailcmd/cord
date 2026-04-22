@@ -4,27 +4,30 @@ defmodule CORD.HTTPServer do
       import Plug.Conn
       import unquote(__MODULE__)
       require Logger
-      
+
       def init(options), do: options
-      defp build_resp(conn) do
+      defp build_resp(%Plug.Conn{} = conn) do
         send_resp(conn, 200, conn.assigns[:text] || "")
       end
+      defp build_resp(_) do
+        throw("Not a connection!!")
+      end
 
-      @before_compile unquote(__MODULE__)       
+      @before_compile unquote(__MODULE__)
     end
   end
-  
+
 
   defmacro __before_compile__(_env) do
     quote do
       # Default response for non legal calls
       def call(conn, _opts) do
-        with list <- String.split(conn.request_path, "/"),             
+        with list <- String.split(conn.request_path, "/"),
              [_, module, fun] <- Enum.map(list, &String.to_atom/1),
              [module, fun] <- [Module.concat([module]), fun],
              true <- function_exported?(module, fun, 1) do
           Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
-          # TODO: Security control, module name starting with "SMI."          
+          # TODO: Security control, module name starting with "SMI."
           try do
             module
             |> apply(fun, [conn])
@@ -38,7 +41,7 @@ defmodule CORD.HTTPServer do
               conn
           end
         else
-          _ -> 
+          _ ->
             Logger.log(:warning, "[CORD][HTTP] 404 - Try to get #{conn.request_path}")
             conn
             |> put_resp_content_type("text/plain")
@@ -48,7 +51,7 @@ defmodule CORD.HTTPServer do
     end
   end
 
-  
+
 	defmacro get(path, do: block) do
     quote do
       def call(
@@ -57,8 +60,8 @@ defmodule CORD.HTTPServer do
           ) do
         _ = var!(opts)
         unquote(block)
-      end      
-    end	  
+      end
+    end
   end
 
 	defmacro post(path, do: block) do
@@ -69,23 +72,23 @@ defmodule CORD.HTTPServer do
           ) do
         _ = var!(opts)
         unquote(block)
-      end      
-    end	  
+      end
+    end
   end
   ###################################################################################
-  # Utils 
-  ################################################################################### 
+  # Utils
+  ###################################################################################
   # def expand_html(html) do
-  #   html 
+  #   html
   #   |> expand_for()
   # end
 
   # def expand_for(html) do
-  #   matchs = 
+  #   matchs =
   #     ~r/:foreach[\t ]+(.+?)[\t ]+in[\t ]+(.+?)[\t ]+:do(.+?):end/s
   #     |> Regex.scan(html, capture: :all)
 
-  #   replaces = 
+  #   replaces =
   #     matchs
   #     |> Enum.map(fn [_, r, rows, body] ->
   #       """
