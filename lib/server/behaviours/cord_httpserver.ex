@@ -17,7 +17,7 @@ defmodule CORD.HTTPServer do
       # Default response for non legal calls
       def call(conn, _opts) do
         with list <- String.split(conn.request_path, "/"),             
-             [_, module, fun] <- Enum.map(&String.to_atom/1),
+             [_, module, fun] <- Enum.map(list, &String.to_atom/1),
              true <- function_exported?(module, fun, 1) do
           Logger.log(:info, "[CORD][HTTP] Calling external function #{module}.#{fun}")
         else
