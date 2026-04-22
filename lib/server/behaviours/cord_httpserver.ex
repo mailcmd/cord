@@ -18,8 +18,11 @@ defmodule CORD.HTTPServer do
       def call(conn, _opts) do
         with list <- String.split(conn.request_path, "/"),             
              [_, module, fun] <- Enum.map(list, &String.to_atom/1),
-             true <- function_exported?(Module.concat([module]), fun, 1) do
+             [module, fun] <- [Module.concat([module]), fun],
+             true <- function_exported?(module, fun, 1) do
           Logger.log(:notice, "[CORD][HTTP] Calling external function #{module}.#{fun}")
+          # TODO: Security control, module name starting with "SMI."
+          apply(module, fun, [conn])
         else
           _ -> 
             Logger.log(:warning, "[CORD][HTTP] 404 - Try to get #{conn.request_path}")
