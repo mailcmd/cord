@@ -38,7 +38,8 @@ defmodule CORD.HTTPServer do
             e ->
               Logger.log(
                 :error,
-                "[CORD][HTTP] Function #{module}.#{fun} does not return a connection struct"
+                "[CORD][HTTP] Function #{module}.#{fun} does not return a connection struct" <>
+                "\n#{inspect e}"
               )
               send_resp(conn, 500, "Internal server error!\n")
           end
