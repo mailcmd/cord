@@ -4,6 +4,7 @@ defmodule CORD.Request do
       import Plug.Conn
       import unquote(__MODULE__)
       require Logger
+
     end
   end
   
@@ -13,5 +14,17 @@ defmodule CORD.Request do
         unquote(block)
       end
     end
-  end  
+  end
+
+  defmacro response(response_text) do
+    quote do
+      assign(var!(conn), :text, unquote(response_text))
+    end
+  end
+
+  defmacro response_type(type) do
+    quote do
+      var!(conn) = put_resp_content_type(var!(conn), unquote(type))
+    end
+  end
 end
