@@ -27,6 +27,7 @@ defmodule CORD.HTTPServer do
                s |> String.split(".") |> Enum.map(&String.to_atom/1)
              end),
              [module, fun] <- [Module.concat(module), fun],
+             _ <- Code.ensure_loaded(module),
              true <- function_exported?(module, fun, 2) do
           
           # TODO: Security control, module name starting with "<app_name>."
