@@ -2,6 +2,7 @@ import Config
 
 config :cord, :http,
        port: 8080,
+       https_port: 8443,
        root_dir: "priv/www/",
        js_dir: "priv/www/js",
        css_dir: "priv/www/css",

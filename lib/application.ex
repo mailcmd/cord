@@ -11,17 +11,37 @@ defmodule CORD.Application do
   def start(_type, _args) do
     Logger.configure(level: Application.get_env(:logger, :level))
 
-    children = [
-      # The HTTP Server
-      {
-        Plug.Cowboy,
-        scheme: :http,
-        plug: {CORD.Webserver, @config},
-        options: [
-          port: Keyword.get(@local_config, :port, Keyword.fetch!(@config, :port)),
-          dispatch: dispatcher()
-        ]
-      },
+    http_server =
+      [
+        {
+          Plug.Cowboy,
+          scheme: :http,
+          plug: {CORD.Webserver, @config},
+          options: [
+            port: Keyword.get(@local_config, :port, Keyword.fetch!(@config, :port)),
+            dispatch: dispatcher()
+          ]
+        }
+      ]
+      ++
+      if @local_config[:https] do
+        [{
+          Plug.Cowboy,
+          scheme: :https,
+          plug: {CORD.Webserver, @config},
+          options: [
+            port: Keyword.get(@local_config, :https_port, Keyword.fetch!(@config, :https_port)),
+            dispatch: dispatcher(),
+            keyfile: Keyword.get(@local_config, :keyfile),
+            certfile: Keyword.get(@local_config, :certfile),
+            otp_app: :secure_app          
+          ]
+        }]
+      else
+        []
+      end
+
+    children = http_server ++ [
       # Channels manager
       {CORD.ChannelsMaster, [:broadcast]},
       # Events manager
