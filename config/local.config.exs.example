@@ -4,6 +4,7 @@ config :cord, :local_config,
     websocket_manager: <module>,
     app_supervisor: <module>,
     events_pop_interval: 5_000,
+    https: false,
     # port: 8080,
     # https_port: 8443,
     api_user_pass: "", # user:pass
