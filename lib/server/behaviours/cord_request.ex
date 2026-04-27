@@ -11,7 +11,7 @@ defmodule CORD.Request do
   defmacro request(fun, do: block) do
     quote do
       def unquote(fun)(var!(conn), var!(params)) do
-        var!(params) = var!(params)
+        _ = var!(params)
         unquote(block)
       end
     end
