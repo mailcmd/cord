@@ -22,6 +22,7 @@ defmodule CORD.HTTPServer do
     quote do
       # Default response for non legal calls
       def call(conn, _opts) do
+        IO.inspect conn.request_path
         with list <- String.split(conn.request_path, "/"),
              [_, module, [fun] | _] <- Enum.map(list, fn s ->
                s |> String.split(".") |> Enum.map(&String.to_atom/1)
