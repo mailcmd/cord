@@ -7,7 +7,8 @@ defmodule CORD.MixProject do
       version: "0.1.0",
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -24,6 +25,13 @@ defmodule CORD.MixProject do
     [
       {:plug_cowboy, "~> 2.0"},
       # Specific for the app below
+    ]
+  end
+
+  defp aliases() do
+    [
+      "deps.get": ["deps.get", "update"],
+      update: ["cmd scripts/update_cordjs.sh"]
     ]
   end
 end
