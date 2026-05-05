@@ -23,6 +23,31 @@ defmodule CORD.HTTPServer do
     end
   end
 
+	defmacro get(path, do: block) do
+    quote do
+      def call(
+            %{method: "GET", request_path: unquote(path)} = var!(conn),
+            var!(opts)
+          ) do
+        _ = var!(opts)
+        var!(conn) = put_resp_header(var!(conn), "server", @http_server_id)
+        unquote(block)
+      end
+    end
+  end
+
+	defmacro post(path, do: block) do
+    quote do
+      def call(
+            %{method: "POST", request_path: unquote(path)} = var!(conn),
+            var!(opts)
+          ) do
+        _ = var!(opts)
+        var!(conn) = put_resp_header(var!(conn), "server", @http_server_id)
+        unquote(block)
+      end
+    end
+  end
 
   defmacro __before_compile__(_env) do
     quote do
@@ -77,29 +102,4 @@ defmodule CORD.HTTPServer do
   end
 
 
-	defmacro get(path, do: block) do
-    quote do
-      def call(
-            %{method: "GET", request_path: unquote(path)} = var!(conn),
-            var!(opts)
-          ) do
-        _ = var!(opts)
-        var!(conn) = put_resp_header(var!(conn), "server", @http_server_id)
-        unquote(block)
-      end
-    end
-  end
-
-	defmacro post(path, do: block) do
-    quote do
-      def call(
-            %{method: "POST", request_path: unquote(path)} = var!(conn),
-            var!(opts)
-          ) do
-        _ = var!(opts)
-        var!(conn) = put_resp_header(var!(conn), "server", @http_server_id)
-        unquote(block)
-      end
-    end
-  end
 end
