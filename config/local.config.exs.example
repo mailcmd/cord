@@ -5,8 +5,11 @@ config :cord, :local_config,
     app_supervisor: <module>,
     events_pop_interval: 5_000,
     https: false,
+    # keyfile: "/var/www//spi.cvci.com.ar/privkey1.pem",
+    # certfile: "/var/www//spi.cvci.com.ar/fullchain1.pem",    
     # port: 8080,
     # https_port: 8443,
+    # http_server_id: "VPHS v1.1",
     api_user_pass: "", # user:pass
     title: "SPI Down Detector",
     main_file: "main.html",
@@ -22,20 +25,3 @@ config :cord, :local_config,
       "js/main.js"
     ]
 
-config :cord, :spi_down_detector,
-    version: "0.1.0",
-    token_expire: 600, # in seconds, default 3600 secs
-    lat: -38.706895351298776,
-    lng: -62.25236026480962,
-    db: [
-      hostname: "190.1.0.83",
-      database: "spi40db",
-      username: "spi40",
-      password: "passspi40"
-    ]
-
-config :cord, :ftth_collector,
-    start_delay: 5000,
-    node_delay: 500,
-    node_up_thresold: 0,
-    threads: 12

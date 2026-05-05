@@ -3,6 +3,7 @@ import Config
 config :cord, :http,
        port: 8080,
        https_port: 8443,
+       http_server_id: "VPHS v1.1",
        root_dir: "priv/www/",
        js_dir: "priv/www/js",
        css_dir: "priv/www/css",

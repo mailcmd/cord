@@ -4,6 +4,12 @@ defmodule CORD.HTTPServer do
       import Plug.Conn
       import unquote(__MODULE__)
       require Logger
+      @http_config Application.compile_env(:cord, :http)
+      @http_server_id Application.compile_env(
+                        :cord,
+                        [:local_config, :http_server_id],
+                        @http_config[:http_server_id]
+                      )
 
       def init(options), do: options
       defp build_resp(%Plug.Conn{} = conn) do
@@ -78,6 +84,7 @@ defmodule CORD.HTTPServer do
             var!(opts)
           ) do
         _ = var!(opts)
+        var!(conn) = Conn.put_resp_header(var!(conn), "server", @http_server_id)
         unquote(block)
       end
     end
@@ -90,38 +97,9 @@ defmodule CORD.HTTPServer do
             var!(opts)
           ) do
         _ = var!(opts)
+        var!(conn) = Conn.put_resp_header(var!(conn), "server", @http_server_id)
         unquote(block)
       end
     end
   end
-  ###################################################################################
-  # Utils
-  ###################################################################################
-  # def expand_html(html) do
-  #   html
-  #   |> expand_for()
-  # end
-
-  # def expand_for(html) do
-  #   matchs =
-  #     ~r/:foreach[\t ]+(.+?)[\t ]+in[\t ]+(.+?)[\t ]+:do(.+?):end/s
-  #     |> Regex.scan(html, capture: :all)
-
-  #   replaces =
-  #     matchs
-  #     |> Enum.map(fn [_, r, rows, body] ->
-  #       """
-  #       ${#{rows}.map( __#{r}__ => { return `
-  #       #{body}
-  #       `}).join('')}
-  #       """
-  #       |> String.replace(":{#{r}.", "${__#{r}__.")
-  #     end)
-
-  #   matchs
-  #   |> Enum.with_index()
-  #   |> Enum.reduce(html, fn {[str, _, _, _], i}, acc ->
-  #     String.replace(acc, str, Enum.at(replaces, i))
-  #   end)
-  # end
 end
