@@ -84,7 +84,7 @@ defmodule CORD.HTTPServer do
             var!(opts)
           ) do
         _ = var!(opts)
-        var!(conn) = Conn.put_resp_header(var!(conn), "server", @http_server_id)
+        var!(conn) = Plug.Conn.put_resp_header(var!(conn), "server", @http_server_id)
         unquote(block)
       end
     end
@@ -97,7 +97,7 @@ defmodule CORD.HTTPServer do
             var!(opts)
           ) do
         _ = var!(opts)
-        var!(conn) = Conn.put_resp_header(var!(conn), "server", @http_server_id)
+        var!(conn) = Plug.Conn.put_resp_header(var!(conn), "server", @http_server_id)
         unquote(block)
       end
     end
