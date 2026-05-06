@@ -9,7 +9,6 @@ defmodule Mix.Tasks.PreInstall do
         Mix.shell().info("Pre-install completed successfully")
       {output, _exit_code} ->
         Mix.shell().error("Pre-install script failed: #{output}")
-        Mix.Tasks.Compile.abort()
     end
   end
 end
