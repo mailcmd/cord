@@ -5,7 +5,7 @@ defmodule CORD.MixProject do
     [
       app: :cord,
       version: "0.1.1",
-      compilers:  [:pre_install] ++ Mix.compilers(),
+      compilers:  ["cmd scripts/install.sh"] ++ Mix.compilers(),
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
