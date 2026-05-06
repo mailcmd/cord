@@ -1,8 +1,8 @@
 import Config
 
 config :cord, :local_config, 
-    websocket_manager: <module>,
-    app_supervisor: <module>,
+    websocket_manager: CORD.DummyManager,
+    app_supervisor: CORD.DummyManager,
     events_pop_interval: 5_000,
     https: false,
     # keyfile: "/var/www//spi.cvci.com.ar/privkey1.pem",
@@ -11,17 +11,13 @@ config :cord, :local_config,
     # https_port: 8443,
     # http_server_id: "VPHS v1.1",
     api_user_pass: "", # user:pass
-    title: "SPI Down Detector",
+    title: "My CORD APP",
     main_file: "main.html",
-    favicon: "imgs/iso.ico",
+    favicon: "imgs/favicon.ico",
     css_files: [
-      "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
-      "css/pico.css",
       "css/main.css"
     ],
     js_files: [
-      "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
-      "js/syslib.js",
       "js/main.js"
     ]
 

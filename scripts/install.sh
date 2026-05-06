@@ -1,7 +1,9 @@
 #!/bin/bash
 test ! -d lib && echo "ERROR: You can not run this script from other directory than project root!!!" && exit 1
 
-test -f lib/server/cord_webserver.ex && echo "WARNING: post-install skipped!" && exit 0
+test -f lib/server/cord_webserver.ex && echo "WARNING: setup skipped!" && exit 0
+
+test -f priv/cord.installed && echo "WARNING: CORD already installed!" && exit 0
 
 echo "Running CORD setup..."
 
