@@ -11,6 +11,8 @@ defmodule CORD.Application do
   def start(_type, _args) do
     Logger.configure(level: Application.get_env(:logger, :level))
 
+    port = Keyword.get(@local_config, :port, Keyword.fetch!(@config, :port)) 
+    sport = Keyword.get(@local_config, :https_port, Keyword.fetch!(@config, :https_port)) || ""
     http_server =
       [
         {
@@ -18,7 +20,7 @@ defmodule CORD.Application do
           scheme: :http,
           plug: {CORD.Webserver, @config},
           options: [
-            port: Keyword.get(@local_config, :port, Keyword.fetch!(@config, :port)),
+            port: port,
             dispatch: dispatcher()
           ]
         }
@@ -30,7 +32,7 @@ defmodule CORD.Application do
           scheme: :https,
           plug: {CORD.Webserver, @config},
           options: [
-            port: Keyword.get(@local_config, :https_port, Keyword.fetch!(@config, :https_port)),
+            port: sport,
             dispatch: dispatcher(),
             keyfile: Keyword.get(@local_config, :keyfile),
             certfile: Keyword.get(@local_config, :certfile),
@@ -59,7 +61,7 @@ defmodule CORD.Application do
 
     opts = [strategy: :one_for_one, name: CORD.Supervisor]
 
-    Logger.log(:notice, "[CORD] Starting CORD services...")
+    Logger.log(:notice, "[CORD] Starting CORD services in ports #{port} #{sport}...")
     Supervisor.start_link(children, opts)
   end
 
