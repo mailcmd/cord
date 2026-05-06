@@ -9,5 +9,8 @@ cp -R deps/cord/lib/layout/* lib/layout/
 mkdir -p config/local
 cp -R deps/cord/config/config.exs config/config.exs
 cp -R deps/cord/config/local.config.exs.example config/local/config.exs
+
+deps/cord/scripts/update_cordjs.sh
+
 exit 0
 

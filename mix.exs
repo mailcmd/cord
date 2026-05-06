@@ -5,7 +5,8 @@ defmodule CORD.MixProject do
     [
       app: :cord,
       version: "0.1.1",
-      compilers:  ["cmd scripts/install.sh"] ++ Mix.compilers(),
+      # compilers:  [:pre_install] ++ Mix.compilers(),
+      compilers: Mix.compilers(),
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -31,8 +32,9 @@ defmodule CORD.MixProject do
 
   defp aliases() do
     [
-      "deps.get": ["deps.get", "update_cordjs"],
-      update_cordjs: ["cmd scripts/update_cordjs.sh"]
+      # "deps.get": ["deps.get", "update_cordjs"],
+      setup: ["cmd scripts/install.sh"],
+      update_cordjs: ["cmd scripts/update_cordjs.sh"],
     ]
   end
 end
