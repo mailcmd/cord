@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Compile.PostInstall do
+defmodule Mix.Tasks.Compile.PreInstall do
   use Mix.Task.Compiler
 
   @impl Mix.Task.Compiler
@@ -8,12 +8,12 @@ defmodule Mix.Tasks.Compile.PostInstall do
       {_output, 0} ->
         {:ok, []}
       {output, _exit_code} ->
-        Mix.shell().error("Post-install script failed: #{output}")
+        Mix.shell().error("Pre-install script failed: #{output}")
         {:error, [%Mix.Task.Compiler.Diagnostic{
-                   file: "scripts/post_install.sh",
+                   file: "scripts/pre_install.sh",
                    position: 0,
-                   compiler_name: :post_install,
-                   message: "Post-install failed",
+                   compiler_name: :pre_install,
+                   message: "Pre-install failed",
                    severity: :error
                  }]}
     end
