@@ -12,7 +12,7 @@ defmodule CORD.Application do
     Logger.configure(level: Application.get_env(:logger, :level))
 
     port = Keyword.get(@local_config, :port, Keyword.fetch!(@config, :port)) 
-    sport = Keyword.get(@local_config, :https_port, Keyword.fetch!(@config, :https_port)) || ""
+    sport = Keyword.get(@local_config, :https_port, Keyword.fetch!(@config, :https_port))
     http_server =
       [
         {
@@ -61,7 +61,10 @@ defmodule CORD.Application do
 
     opts = [strategy: :one_for_one, name: CORD.Supervisor]
 
-    Logger.log(:notice, "[CORD] Starting CORD services in ports #{port} #{sport}...")
+    Logger.log(:notice,
+               "[CORD] Starting CORD services in ports "<>
+               "#{port} #{@local_config[:https] && sport || ""}..."
+    )
     Supervisor.start_link(children, opts)
   end
 

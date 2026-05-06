@@ -4,7 +4,7 @@ defmodule CORD.MixProject do
   def project do
     [
       app: :cord,
-      version: "0.1.1",
+      version: "0.1.2",
       # compilers:  [:pre_install] ++ Mix.compilers(),
       compilers: Mix.compilers(),
       elixir: "~> 1.18",
