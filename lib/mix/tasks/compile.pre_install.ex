@@ -12,6 +12,9 @@ defmodule Mix.Tasks.Compile.PreInstall do
       {output, _exit_code} ->
         Mix.shell().error("Pre-install script failed: #{output}")
         {:error, [%Mix.Task.Compiler.Diagnostic{
+                   file: "scripts/install.sh",
+                   position: 0,
+                   compiler_name: :pre_install,
                    message: "Pre-install failed",
                    severity: :error
                  }]}
