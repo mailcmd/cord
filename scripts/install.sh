@@ -14,7 +14,11 @@ mkdir -p config/local
 cp -R deps/cord/config/config.exs config/config.exs
 cp -R deps/cord/config/local.config.exs.example config/local/config.exs
 
-mkdir priv
+mkdir -p priv/www/imgs
+mkdir priv/www/css
+mkdir priv/www/js
+
+touch priv/www/main.html
 
 deps/cord/scripts/update_cordjs.sh
 
