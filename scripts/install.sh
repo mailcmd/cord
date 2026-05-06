@@ -3,6 +3,8 @@ test ! -d lib && echo "ERROR: You can not run this script from other directory t
 
 test -f lib/server/cord_webserver.ex && echo "WARNING: post-install skipped!" && exit 0
 
+echo "Running CORD setup..."
+
 mkdir lib/layout 
 cp -R deps/cord/lib/layout/* lib/layout/
 
