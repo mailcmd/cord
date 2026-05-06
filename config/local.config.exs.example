@@ -1,8 +1,8 @@
 import Config
 
 config :cord, :local_config, 
+    app_supervisor: CORD.DummySupervisor,
     websocket_manager: CORD.DummyManager,
-    app_supervisor: CORD.DummyManager,
     events_pop_interval: 5_000,
     https: false,
     # keyfile: "/var/www//spi.cvci.com.ar/privkey1.pem",
