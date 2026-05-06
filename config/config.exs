@@ -15,10 +15,10 @@ config :logger,
 config :logger, :default_formatter,
        format: "$date $time - [$level] $message $metadata\n"
 
-"config/local/*.exs"
-|> Path.wildcard()
-|> Enum.each( fn file ->
-  "local/"
-  |> Kernel.<>(file |> Path.basename())
-  |> import_config()
-end)
+# "config/local/*.exs"
+# |> Path.wildcard()
+# |> Enum.each( fn file ->
+#   "local/"
+#   |> Kernel.<>(file |> Path.basename())
+#   |> import_config()
+# end)
