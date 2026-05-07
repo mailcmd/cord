@@ -22,5 +22,7 @@ touch priv/www/main.html
 
 deps/cord/scripts/update_cordjs.sh
 
+touch priv/cord.installed
+
 exit 0
 
