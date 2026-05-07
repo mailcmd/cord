@@ -4,6 +4,12 @@ defmodule CORD.Request do
       import Plug.Conn
       import unquote(__MODULE__)
       require Logger
+      @http_config Application.compile_env(:cord, :http)
+      @http_server_id Application.compile_env(
+                        :cord,
+                        [:local_config, :http_server_id],
+                        @http_config[:http_server_id]
+                      )
 
     end
   end
@@ -12,6 +18,7 @@ defmodule CORD.Request do
     quote do
       def unquote(fun)(var!(conn), var!(params) \\ nil) do
         _ = var!(params)
+        var!(conn) = put_resp_header(var!(conn), "server", @http_server_id)
         unquote(block)
       end
     end
