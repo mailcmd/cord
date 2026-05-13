@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">  
   <title>#{title}</title>
 
   #{for css <- css_files do
@@ -12,6 +12,9 @@
     end
   end |> Enum.join("\n")}
   <style>
+    body {
+        visibility: hidden;
+    }
     nocscript[cord-id] {
         display: none;
     }
