@@ -13,7 +13,7 @@ defmodule CORD.HTTPServer do
 
       def init(options), do: options
       defp build_resp(%Plug.Conn{} = conn) do
-        send_resp(conn, 200, conn.assigns[:text] || "")
+        send_resp(conn, conn.assigns[:code] || 200, conn.assigns[:text] || "")
       end
       defp build_resp(_) do
         throw("Not a connection!!")

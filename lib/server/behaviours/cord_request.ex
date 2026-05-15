@@ -44,9 +44,11 @@ defmodule CORD.Request do
     end
   end
 
-  defmacro response(response_text) do
+  defmacro response(response_text, code \\ 200) do
     quote do
-      assign(var!(conn), :text, unquote(response_text))
+      var!(conn)
+      |> assign(:text, unquote(response_text))
+      |> assign(:code, unquote(code))
     end
   end
 
